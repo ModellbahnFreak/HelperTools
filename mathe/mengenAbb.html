@@ -1,0 +1,201 @@
+<html>
+
+<head>
+	<title>Mengen-Abbildung Gegenbeispiele</title>
+</head>
+
+<body>
+	f: <input type="text" id="defMenge"> &rarr; <input type="text" id="imgMenge"> <button type="button"
+		onclick="calc();">Rechne</button>
+	<span id="erg"></span>
+	<script>
+		function Abbildung(def, img) {
+			this.from = def;
+			this.toIdx = [];
+			this.img = img;
+		}
+
+		Abbildung.prototype.next = function () {
+			if (this.toIdx.length != this.from.length) {
+				for (var i = 0; i < this.from.length; i++) {
+					this.toIdx[i] = 0;
+				}
+				return true;
+			} else {
+				var incNext = true;
+				for (var i = 0; i < this.from.length; i++) {
+					this.toIdx[i]++;
+					if (this.toIdx[i] < this.img.length) {
+						incNext = false;
+						break;
+					} else {
+						this.toIdx[i] = 0;
+					}
+				}
+				return !incNext;
+			}
+		};
+
+		Abbildung.prototype.calcCombinations = function () {
+			return Math.pow(this.img.length, this.from.length);
+		};
+
+		Abbildung.prototype.apply = function (val) {
+			if (isFinite(val)) {
+				var idx = this.from.indexOf(val);
+				if (idx >= 0) {
+					return this.img[this.toIdx[idx]];
+				}
+			} else if (val instanceof Array) {
+				var erg = [];
+				for (var i = 0; i < val.length; i++) {
+					erg[i] = this.apply(val[i]);
+					if (erg[i] == undefined) {
+						return undefined;
+					}
+				}
+				return erg;
+			}
+			return undefined;
+		};
+
+		Abbildung.prototype.equals = function (abb) {
+			if (this.from.length != abb.from.length || this.toIdx.length != abb.toIdx.length) {
+				return false;
+			}
+			for (var i = 0; i < this.from.length; i++) {
+				var idxAbb = abb.from.indexOf(this.from[i]);
+				if (idxAbb < 0) {
+					return false;
+				}
+				if (this.img[this.toIdx[i]] != abb.img[abb.toIdx[idxAbb]]) {
+					return false;
+				}
+			}
+			return true;
+		};
+
+		Abbildung.prototype.toString = function () {
+			var out = "{";
+			for (var i = 0; i < this.from.length; i++) {
+				out += this.from[i] + "-" + this.img[this.toIdx[i]] + ";";
+			}
+			out = out.substr(0, out.length - 1);
+			out += "}";
+			return out;
+		};
+
+		function applyF(arr, a, b, c) {
+			for (var i = 0; i < 3; i++) {
+				if (arr[i] == 1) {
+					arr[i] = a;
+				} else if (arr[i] == 2) {
+					arr[i] = b;
+				} else if (arr[i] == 3) {
+					arr[i] = c;
+				}
+			}
+			return arr;
+		}
+
+		function check(f, g) {
+			//g(M) = applyF([1,2,3], d,e,f)
+			//f(M) = applyF([1,2,3], a,b,c)
+			var inner = g.apply([1, 2, 3]);
+			var outer = f.apply([1, 2, 3]);
+			var chain = f.apply(inner);
+			return arrayCmp(chain, outer);
+		}
+
+		var bod = document.getElementById("erg");
+		var
+
+		function calc() {
+			var f = new Abbildung([1, 2, 3], [1, 2, 3]);
+			var g = new Abbildung([1, 2, 3], [1, 2, 3]);
+			var numCombF = f.calcCombinations();
+			var numCombG = g.calcCombinations();
+
+			while (f.next()) {
+				while (g.next()) {
+					if (f.equals(g)) {
+						if (!check(f, g)) {
+							bod.innerText += "Not Refl: f=" + f.toString() + ", g=" + g.toString() + "\n";
+						}
+					}
+					if (check(f, g)) {
+						if (!check(g, f)) {
+							bod.innerText += "Not Symm: f=" + f.toString() + ", g=" + g.toString() + "\n";
+						} else {
+							if (!f.equals(g)) {
+								bod.innerText += "Not Iden: f=" + f.toString() + ", g=" + g.toString() + "\n";
+							}
+						}
+					}
+				}
+			}
+		}
+
+		/*for (var a = 1; a <= 3; a++) { //f: 1-a; 2-b; 3-c
+			for (var b = 1; b <= 3; b++) {
+				for (var c = 1; c <= 3; c++) {
+					var fParam = [a, b, c];
+					for (var d = 1; d <= 3; d++) { //g: 1-a; 2-b; 3-c
+						for (var e = 1; e <= 3; e++) {
+							for (var f = 1; f <= 3; f++) {
+								var gParam = [d, e, f];
+								for (var g = 1; g <= 3; g++) { //1-a; 2-b; 3-c
+									for (var h = 1; h <= 3; h++) {
+										for (var i = 1; i <= 3; i++) {
+											var hParam = [g, h, i];
+											if (check(fParam, gParam) && check(gParam, hParam)) {
+												if (!check(fParam, hParam)) {
+													bod.innerText += "Not Trans: f:(1-" + a + ";2-" + b + ";3-" + c + "), g:(1-" + d + ";2-" + e + ";3-" + f + "), h:(1-" + g + ";2-" + h + ";3-" + i + ")\n";
+												}
+											}
+										}
+									}
+								}
+								//reflexiv
+								if (arrayCmp(fParam, gParam)) {
+									if (!check(fParam, fParam)) {
+										bod.innerText += "Not Refl: f:(1-" + a + ";2-" + b + ";3-" + c + "), g:(1-" + d + ";2-" + e + ";3-" + f + ")\n";
+									}
+								}
+								//symm
+								if (check(fParam, gParam)) {
+									if (!check(gParam, fParam)) {
+										bod.innerText += "Not Symm: f:(1-" + a + ";2-" + b + ";3-" + c + "), g:(1-" + d + ";2-" + e + ";3-" + f + ")\n";
+									}
+								}
+								//Iden
+								if (check(fParam, gParam)) {
+									if (check(gParam, fParam)) {
+										if (!arrayCmp(fParam, gParam)) {
+											bod.innerText += "Not Iden: f:(1-" + a + ";2-" + b + ";3-" + c + "), g:(1-" + d + ";2-" + e + ";3-" + f + ")\n";
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}*/
+
+
+		function arrayCmp(arr1, arr2) {
+			if (arr1.length != arr2.length) {
+				return false;
+			}
+			for (var i = 0; i < arr1.length; i++) {
+				if (arr1[i] != arr2[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+	</script>
+</body>
+
+</html>

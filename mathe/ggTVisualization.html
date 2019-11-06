@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ggT Visualization Tool</title>
+</head>
+
+<body>
+    m = <input type="number" id="m" value="1"><br>
+    n = <input type="number" id="n" value="1"><br>
+    <span id="out"></span>
+    <script>
+        var mElem = document.getElementById("m");
+        var nElem = document.getElementById("n");
+        var out = document.getElementById("out");
+
+        function calc() {
+            var m = mElem.value;
+            var n = nElem.value;
+            var minVal = 0;
+            for (var s = -m; s < n; s++) {
+                for (var t = -n; t <= m; t++) {
+                    var val = s * m + t * n;
+                    if (val >= 1 && (minVal == 0 || val < minVal)) {
+                        minVal = val;
+                    }
+                }
+            }
+
+            while (m != n && m > 0 && n > 0) {
+                if (m > n) {
+                    m = m % n;
+                } else {
+                    n = n % m;
+                }
+            }
+            if (m != 0) {
+                out.innerText = "Min: " + minVal + "\n ggT: " + m;
+            } else {
+                out.innerText = "Min: " + minVal + "\n ggT: " + n;
+            }
+        }
+
+        mElem.addEventListener("change", calc);
+        nElem.addEventListener("change", calc);
+    </script>
+</body>
+
+</html>

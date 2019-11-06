@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="vars.js"></script>
     <script src="automataDraw.js"></script>
+    <script src="automata.js"></script>
     <title>Automata to LaTeX</title>
 </head>
 
@@ -13,7 +15,7 @@
     Variables/non-terminal symbols:<br>
     <input type="text" name="txtVars" id="txtVars" value="S,T,F"><br>
     Production rules:<br>
-    <textarea name="grammar" id="grammar" cols="30" rows="10">S-aT|bF,T-bF,F-aT</textarea><br>
+    <textarea name="grammar" id="grammar" cols="30" rows="10">S-aT|bF,T-bF|b,F-aT|a</textarea><br>
     <button type="button" id="btnParse">Parse</button>
     <button type="button" id="btnDraw">Draw</button>
     <button type="button" id="btnLatex">To LaTeX</button><br>

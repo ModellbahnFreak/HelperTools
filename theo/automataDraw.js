@@ -1,16 +1,3 @@
-var out = null;
-var svg = null;
-var txtGrammar = null;
-var txtVars = null;
-var numDerive = null;
-var numMaxLen = null;
-var btnParse = null;
-var btnDraw = null;
-var btnDerive = null;
-var btnLatex = null;
-var grParse = {};
-var producedWords = [];
-
 function grammarChange() {
     btnParse.disabled = "";
 }
@@ -52,7 +39,9 @@ function parse() {
     btnParse.disabled = "disabled";
     btnDraw.disabled = "";
     btnDerive.disabled = "";
-    btnLatex.disabled = "";
+    if (grParse.type == 3) {
+        btnLatex.disabled = "";
+    }
 }
 
 function addToGrammar(left, right) {
@@ -166,8 +155,8 @@ function derive() {
             grParse.rules.forEach(function (rule) {
                 if (rule.hasOwnProperty("from") && rule.hasOwnProperty("to")) {
                     var fromPos = word.indexOf(rule.from)
-                    //while (fromPos >= 0) {
-                    if (fromPos >= 0) {
+                    while (fromPos >= 0) {
+                        //if (fromPos >= 0) {
                         rule.to.forEach(function (rightSide) {
                             if (rightSide.hasOwnProperty("str")) {
                                 if (maxLen == -1 || word.length - rule.from.length + rightSide.str.length <= maxLen) {
@@ -192,8 +181,8 @@ function derive() {
     if (!foundWords) {
         out.innerText += "Finished! No more words found\n";
     }
-    //out.innerText += producedWords;
-    out.innerText += "Found " + producedWords.length;
+    out.innerText += "Found " + producedWords.length + "\n";
+    out.innerText += producedWords;
 }
 
 function getType() {
@@ -208,10 +197,14 @@ function getType() {
             }
             rule.to.forEach(function (rightSide) {
                 if (rightSide.hasOwnProperty("str")) {
-                    if (rightSide.str.length < rule.from.length) {
-                        type = 0;
-                    } else if (rightSide.str.length > 2 || grParse.alphabet.indexOf(rightSide.str.charAt(0)) < 0 || (rightSide.str.length == 2 && grParse.variables.indexOf(rightSide.str.charAt(1)) < 0)) {
-                        type = 2;
+                    if (!epsilonRuleApplies(rule.from, rightSide.str)) {
+                        if (rightSide.str.length < rule.from.length) {
+                            type = 0;
+                        } else if (rightSide.str.length < 1 || rightSide.str.length > 2
+                            || grParse.alphabet.indexOf(rightSide.str.charAt(0)) < 0
+                            || (rightSide.str.length == 2 && grParse.variables.indexOf(rightSide.str.charAt(1)) < 0)) {
+                            type = 2;
+                        }
                     }
                 }
             });
@@ -220,38 +213,19 @@ function getType() {
     grParse.type = type;
 }
 
-function toLatex() {
-    if (!grParse.hasOwnProperty("variables") || !grParse.hasOwnProperty("rules") || !grParse.hasOwnProperty("alphabet") || !grParse.hasOwnProperty("start")) {
-        return;
-    }
-    if (grParse.type != 3) {
-        out.innerText = "The given grammar is not of type 3 so an automata can't be drawn!";
-        return;
-    }
-    var tex = "\\begin{figure}[!h]\n\\centering\n\\begin{tikzpicture}[initial text={}]\n";
-    var lastVar = "";
-    grParse.variables.forEach(function (nonTer) {
-        tex += "\\node[state";
-        if (grParse.start == nonTer) {
-            tex += ",initial";
-        }
-        tex += "] (" + nonTer + ")";
-        if (lastVar != "") {
-            tex += " [right=of " + lastVar + "]";
-        }
-        tex += " {$" + nonTer + "$};\n";
-    });
-    grParse.rules.forEach(function (nonTer) {
-        nonTer.to.forEach(function (ter) {
-            tex += "\\path[->";
-            if (ter.str.charAt(1) == nonTer.from) {
-                tex += ",loop above";
-            }
-            tex += "] (" + nonTer.from + ") edge node[below]{$" + ter.str.charAt(0) + "$} (" + ter.str.charAt(1) + ");\n";
+function epsilonRuleApplies(from, to) {
+    if (to.length == 0 && from == grParse.start) {
+        grParse.rules.forEach(function (rule) {
+            rule.to.forEach(function (rightSide) {
+                if (rightSide.str.indexOf(from) >= 0) {
+                    return false;
+                }
+            });
         });
-    });
-    tex += "\\end{tikzpicture}\n\\caption{Nicht deterministischer Automat}\n\\label{fig:automat}\n\\end{figure}";
-    out.innerText = tex;
+        console.log("epsilon rule aplies");
+        return true;
+    }
+    return false;
 }
 
 function parseErr(e) {
@@ -261,27 +235,4 @@ function parseErr(e) {
     btnDraw.disabled = "disabled";
     btnDerive.disabled = "disabled";
     btnLatex.disabled = "disabled";
-}
-
-function init() {
-    out = document.getElementById("outText");
-    svg = document.getElementById("svg");
-    txtGrammar = document.getElementById("grammar");
-    txtVars = document.getElementById("txtVars");
-    btnParse = document.getElementById("btnParse");
-    btnDraw = document.getElementById("btnDraw");
-    btnDerive = document.getElementById("btnDerive");
-    btnLatex = document.getElementById("btnLatex");
-    numDerive = document.getElementById("numDerive");
-    numMaxLen = document.getElementById("numMaxLen");
-
-    btnDraw.disabled = "disabled";
-    btnDerive.disabled = "disabled";
-    btnLatex.disabled = "disabled";
-    txtGrammar.addEventListener("change", grammarChange);
-    txtVars.addEventListener("change", grammarChange);
-    btnParse.addEventListener("click", parse);
-    btnDraw.addEventListener("click", draw);
-    btnDerive.addEventListener("click", derive);
-    btnLatex.addEventListener("click", toLatex);
 }
