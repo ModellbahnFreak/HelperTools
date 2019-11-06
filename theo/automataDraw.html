@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="automataDraw.js"></script>
+    <title>Automata to LaTeX</title>
+</head>
+
+<body>
+    Variables/non-terminal symbols:<br>
+    <input type="text" name="txtVars" id="txtVars" value="S,A"><br>
+    Production rules:<br>
+    <textarea name="grammar" id="grammar" cols="30" rows="10">S-bA|Ab,A-a</textarea><br>
+    <button type="button" id="btnParse">Parse</button>
+    <button type="button" id="btnDraw">Draw</button>
+    <button type="button" id="btnLatex">To LaTeX</button><br>
+    <button type="button" id="btnDerive">Derive</button> <input type="number" id="numDerive" value="1"> times<br>
+    <span id="outText"></span><br>
+    <svg id="svg"></svg>
+    <script>
+        init();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+{
+    "variables": [
+        "S",
+        "A"
+    ],
+    "rules": [
+        {
+            "from": "S",
+            "to": [
+                {
+                    "str": "aA"
+                },
+                {
+                    "str": "Aa"
+                }
+            ]
+        },
+        {
+            "from": "aAa",
+            "to": [
+                {
+                    "str": "aAa"
+                },
+                {
+                    "str": "aa"
+                }
+            ]
+        }
+    ],
+    "alphabet": [
+        "a",
+        "b"
+    ],
+    "start": "S",
+    "type": 1
+}
