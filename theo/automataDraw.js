@@ -3,6 +3,7 @@ var svg = null;
 var txtGrammar = null;
 var txtVars = null;
 var numDerive = null;
+var numMaxLen = null;
 var btnParse = null;
 var btnDraw = null;
 var btnDerive = null;
@@ -15,6 +16,8 @@ function grammarChange() {
 }
 
 function parse() {
+    grParse = {};
+
     var variables = txtVars.value;
     var grStr = txtGrammar.value;
 
@@ -40,6 +43,8 @@ function parse() {
             });
         }
     });
+
+    getType();
 
     out.innerHTML = "Parsed grammar: <br>" + grammarToStr();
     producedWords = [grParse.start];
@@ -132,6 +137,8 @@ function grammarToStr() {
     });
     txt = txt.substr(0, txt.length - 2);
     txt += "<br>Start symbol: " + grParse.start;
+
+    txt += "<br>Type: " + grParse.type;
     return txt;
 }
 
@@ -144,6 +151,10 @@ function derive() {
     if (!(anzDeriv > 0)) {
         anzDeriv = 1;
     }
+    var maxLen = parseInt(numMaxLen.value);
+    if (!(maxLen > -1)) {
+        maxLen = -1;
+    }
     if (!grParse.hasOwnProperty("variables") || !grParse.hasOwnProperty("rules") || !grParse.hasOwnProperty("alphabet") || !grParse.hasOwnProperty("start")) {
         return;
     }
@@ -155,12 +166,15 @@ function derive() {
             grParse.rules.forEach(function (rule) {
                 if (rule.hasOwnProperty("from") && rule.hasOwnProperty("to")) {
                     var fromPos = word.indexOf(rule.from)
-                    while (fromPos >= 0) {
+                    //while (fromPos >= 0) {
+                    if (fromPos >= 0) {
                         rule.to.forEach(function (rightSide) {
                             if (rightSide.hasOwnProperty("str")) {
-                                var newWord = word.substr(0, fromPos) + rightSide.str + word.substr(fromPos + rule.from.length);
-                                if (producedWords.indexOf(newWord) < 0) {
-                                    newProduced.push(newWord);
+                                if (maxLen == -1 || word.length - rule.from.length + rightSide.str.length <= maxLen) {
+                                    var newWord = word.substr(0, fromPos) + rightSide.str + word.substr(fromPos + rule.from.length);
+                                    if (producedWords.indexOf(newWord) < 0) {
+                                        newProduced.push(newWord);
+                                    }
                                 }
                             }
                         });
@@ -174,10 +188,42 @@ function derive() {
             foundWords = true;
         }
     }
+    out.innerText = "";
     if (!foundWords) {
-        console.log("Finished! No more words found");
+        out.innerText += "Finished! No more words found\n";
     }
-    console.log(producedWords);
+    //out.innerText += producedWords;
+    out.innerText += "Found " + producedWords.length;
+}
+
+function getType() {
+    if (!grParse.hasOwnProperty("variables") || !grParse.hasOwnProperty("rules") || !grParse.hasOwnProperty("alphabet") || !grParse.hasOwnProperty("start")) {
+        return;
+    }
+    var type = 3;
+    grParse.rules.forEach(function (rule) {
+        if (rule.hasOwnProperty("from") && rule.hasOwnProperty("to")) {
+            if (rule.from.length > 1 || grParse.variables.indexOf(rule.from) < 0) {
+                type = 1;
+            }
+            rule.to.forEach(function (rightSide) {
+                if (rightSide.hasOwnProperty("str")) {
+                    if (rightSide.str.length < rule.from.length) {
+                        type = 0;
+                    } else if (rightSide.str.length > 2 || grParse.alphabet.indexOf(rightSide.str.charAt(0)) < 0 || (rightSide.str.length == 2 && grParse.variables.indexOf(rightSide.str.charAt(1)) < 0)) {
+                        type = 2;
+                    }
+                }
+            });
+        }
+    });
+    grParse.type = type;
+}
+
+function toLatex() {
+    if (!grParse.hasOwnProperty("variables") || !grParse.hasOwnProperty("rules") || !grParse.hasOwnProperty("alphabet") || !grParse.hasOwnProperty("start")) {
+        return;
+    }
 }
 
 function parseErr(e) {
@@ -199,6 +245,7 @@ function init() {
     btnDerive = document.getElementById("btnDerive");
     btnLatex = document.getElementById("btnLatex");
     numDerive = document.getElementById("numDerive");
+    numMaxLen = document.getElementById("numMaxLen");
 
     btnDraw.disabled = "disabled";
     btnDerive.disabled = "disabled";
@@ -208,4 +255,5 @@ function init() {
     btnParse.addEventListener("click", parse);
     btnDraw.addEventListener("click", draw);
     btnDerive.addEventListener("click", derive);
+    btnLatex.addEventListener("click", toLatex());
 }
