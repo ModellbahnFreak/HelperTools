@@ -224,6 +224,34 @@ function toLatex() {
     if (!grParse.hasOwnProperty("variables") || !grParse.hasOwnProperty("rules") || !grParse.hasOwnProperty("alphabet") || !grParse.hasOwnProperty("start")) {
         return;
     }
+    if (grParse.type != 3) {
+        out.innerText = "The given grammar is not of type 3 so an automata can't be drawn!";
+        return;
+    }
+    var tex = "\\begin{figure}[!h]\n\\centering\n\\begin{tikzpicture}[initial text={}]\n";
+    var lastVar = "";
+    grParse.variables.forEach(function (nonTer) {
+        tex += "\\node[state";
+        if (grParse.start == nonTer) {
+            tex += ",initial";
+        }
+        tex += "] (" + nonTer + ")";
+        if (lastVar != "") {
+            tex += " [right=of " + lastVar + "]";
+        }
+        tex += " {$" + nonTer + "$};\n";
+    });
+    grParse.rules.forEach(function (nonTer) {
+        nonTer.to.forEach(function (ter) {
+            tex += "\\path[->";
+            if (ter.str.charAt(1) == nonTer.from) {
+                tex += ",loop above";
+            }
+            tex += "] (" + nonTer.from + ") edge node[below]{$" + ter.str.charAt(0) + "$} (" + ter.str.charAt(1) + ");\n";
+        });
+    });
+    tex += "\\end{tikzpicture}\n\\caption{Nicht deterministischer Automat}\n\\label{fig:automat}\n\\end{figure}";
+    out.innerText = tex;
 }
 
 function parseErr(e) {
@@ -255,5 +283,5 @@ function init() {
     btnParse.addEventListener("click", parse);
     btnDraw.addEventListener("click", draw);
     btnDerive.addEventListener("click", derive);
-    btnLatex.addEventListener("click", toLatex());
+    btnLatex.addEventListener("click", toLatex);
 }
