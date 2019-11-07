@@ -27,5 +27,8 @@
         }
     },
     "start": "A",
-    "accept": "C"
+    "accept": [
+        "C"
+    ],
+    "type": "NFA/DFA"
 }

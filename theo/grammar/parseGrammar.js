@@ -37,10 +37,11 @@ function parse() {
     producedWords = [grParse.start];
 
     btnParse.disabled = "disabled";
+    btnLatex.disabled = "disabled";
     btnDraw.disabled = "";
     btnDerivate.disabled = "";
     if (grParse.type == 3) {
-        btnLatex.disabled = "";
+        btnGramToAutom.disabled = "";
     }
 }
 
