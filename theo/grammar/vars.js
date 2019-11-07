@@ -10,6 +10,7 @@ var btnDerivate = null;
 var btnLatex = null;
 var btnGramToAutom = null;
 var btnCheckAutom = null;
+var btnCheckGrammar = null;
 var txtWord = null;
 var grParse = {};
 var producedWords = [];
@@ -29,6 +30,7 @@ function init() {
     btnGramToAutom = document.getElementById("btnGramToAutom");
     btnCheckAutom = document.getElementById("btnCheckAutom");
     txtWord = document.getElementById("txtWord");
+    btnCheckGrammar = document.getElementById("btnCheckGrammar");
 
     btnDraw.disabled = "disabled";
     btnDerivate.disabled = "disabled";
@@ -38,8 +40,19 @@ function init() {
     txtVars.addEventListener("change", grammarChange);
     btnParse.addEventListener("click", parse);
     btnDraw.addEventListener("click", draw);
-    btnDerivate.addEventListener("click", derivate);
+    btnDerivate.addEventListener("click", function () {
+        var anzDeriv = parseInt(numDerivate.value);
+        if (!(anzDeriv > 0)) {
+            anzDeriv = 1;
+        }
+        var maxLen = parseInt(numMaxLen.value);
+        if (!(maxLen > -1)) {
+            maxLen = -1;
+        }
+        derivate(anzDeriv, maxLen);
+    });
     btnLatex.addEventListener("click", toLatex);
     btnGramToAutom.addEventListener("click", grmmarToAutomata);
     btnCheckAutom.addEventListener("click", checkWordAutom);
+    btnCheckGrammar.addEventListener("click", checkWordGrammar);
 }

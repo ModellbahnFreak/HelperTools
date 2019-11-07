@@ -1,12 +1,4 @@
-function derivate() {
-    var anzDeriv = parseInt(numDerivate.value);
-    if (!(anzDeriv > 0)) {
-        anzDeriv = 1;
-    }
-    var maxLen = parseInt(numMaxLen.value);
-    if (!(maxLen > -1)) {
-        maxLen = -1;
-    }
+function derivate(anzDeriv, maxLen) {
     if (!grParse.hasOwnProperty("variables") || !grParse.hasOwnProperty("rules") || !grParse.hasOwnProperty("alphabet") || !grParse.hasOwnProperty("start")) {
         return;
     }
@@ -46,4 +38,32 @@ function derivate() {
     }
     out.innerText += "Found " + producedWords.length + "\n";
     out.innerText += producedWords;
+}
+
+function checkWordGrammar() {
+    var word = txtWord.value;
+
+    var notFoundReason = 2;//not found; 2: too short; 0: found
+    producedWords.forEach(function (w) {
+        if (w == word) {
+            out.innerText = "The word was found in the language.";
+            notFoundReason = 0;
+            return;
+        }
+        if (w.length >= word.length) {
+            notFoundReason = 1;
+        }
+    });
+    if (notFoundReason == 2) {
+        out.innerText = "The word wasn't found in the list of known derivates. Try derivating at least untill the length of the derivates matches your word.";
+        if (grParse.hasOwnProperty("type")) {
+            if (grParse.type > 0) {
+                out.innerText = "Trying to create more derivates to potentially find the word. Pleas wait.";
+                derivate(7, word.length);
+            }
+            checkWordGrammar();
+        }
+    } else if (notFoundReason == 1) {
+        out.innerText = "The word wasn't found in with the known derivates. This means with a high probability that the word isn't in the language. But it's not for sure!";
+    }
 }
