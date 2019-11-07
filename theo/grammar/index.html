@@ -19,10 +19,14 @@
     <textarea name="grammar" id="grammar" cols="30" rows="10">S-aT|bF,T-bF|b,F-aT|a</textarea><br>
     Grammar: <button type="button" id="btnParse">Parse</button>
     <button type="button" id="btnGramToAutom">To Automata</button><br>
-    <button type="button" id="btnDerivate">Derivate</button> <input type="number" id="numDerivate" value="1"> times<br>
+    <button type="button" id="btnDerivate">Derivate</button> <input type="number" id="numDerivate" value="1"
+        style="width:47px;"> times; Max. word length:<input type="number" id="numMaxLen" value="-1"
+        style="width:47px;"><br>
     Automata: <button type="button" id="btnDraw">Draw</button>
     <button type="button" id="btnLatex">To LaTeX</button><br>
-    Max. word length:<input type="number" id="numMaxLen" value="-1"><br>
+    <input type="text" id="txtWord"><button type="button" id="btnCheckAutom">Check word (a)</button><button
+        type="button" id="btnCheckGrammar">Check word (g)</button><br>
+    <br>
     <span id="outText"></span><br>
     <svg id="svg"></svg>
     <script>

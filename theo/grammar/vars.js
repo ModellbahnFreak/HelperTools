@@ -9,6 +9,8 @@ var btnDraw = null;
 var btnDerivate = null;
 var btnLatex = null;
 var btnGramToAutom = null;
+var btnCheckAutom = null;
+var txtWord = null;
 var grParse = {};
 var producedWords = [];
 var automParse = {};
@@ -25,6 +27,8 @@ function init() {
     numDerivate = document.getElementById("numDerivate");
     numMaxLen = document.getElementById("numMaxLen");
     btnGramToAutom = document.getElementById("btnGramToAutom");
+    btnCheckAutom = document.getElementById("btnCheckAutom");
+    txtWord = document.getElementById("txtWord");
 
     btnDraw.disabled = "disabled";
     btnDerivate.disabled = "disabled";
@@ -37,4 +41,5 @@ function init() {
     btnDerivate.addEventListener("click", derivate);
     btnLatex.addEventListener("click", toLatex);
     btnGramToAutom.addEventListener("click", grmmarToAutomata);
+    btnCheckAutom.addEventListener("click", checkWordAutom);
 }

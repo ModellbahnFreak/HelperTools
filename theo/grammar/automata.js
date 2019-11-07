@@ -29,7 +29,9 @@ function grmmarToAutomata() {
     automParse["accept"] = [];
     automParse.accept.push(endState);
 
+    automParse["type"] = "DFA";
     automParse["function"] = [];
+    automParse["function2"] = [];
     grParse.rules.forEach(function (rule) {
         rule.to.forEach(function (right) {
             //Add first state as accepting state, if it leads to epsilon
@@ -50,6 +52,7 @@ function grmmarToAutomata() {
             }
             if (automParse.function[rule.from].hasOwnProperty(nonTer)) {
                 console.log("The grammar can't be converted to a DFA");
+                automParse["type"] = "NFA";
                 var oldNextState = automParse.function[rule.from][nonTer];
                 if (oldNextState instanceof Array) {
                     oldNextState.push(newState);
@@ -60,12 +63,97 @@ function grmmarToAutomata() {
             } else {
                 automParse.function[rule.from][nonTer] = newState;
             }
+
+            if (!automParse.function2.hasOwnProperty(rule.from)) {
+                automParse.function2[rule.from] = {};
+            }
+            if (automParse.function2[rule.from].hasOwnProperty(newState)) {
+                automParse.function2[rule.from][newState].push(nonTer);
+            } else {
+                automParse.function2[rule.from][newState] = [nonTer];
+            }
         });
     });
+
+    out.innerText = "Converted Grammar to automata.\nTha automata is of type: " + automParse.type;
 
     btnLatex.disabled = "";
 }
 
+function toLatex(automat) {
+    if (!automParse.hasOwnProperty("states") || !automParse.hasOwnProperty("function2") || !automParse.hasOwnProperty("accept") || !automParse.hasOwnProperty("start")) {
+        return;
+    }
+    var tex = "\\begin{figure}[!h]\n\\centering\n\\begin{tikzpicture}[initial text={}]\n";
+    var lastVar = "";
+    automParse.states.forEach(function (state) {
+        tex += "\\node[state";
+        if (automParse.start == state) {
+            tex += ",initial";
+        }
+        if (automParse.accept.indexOf(state) >= 0) {
+            tex += ",accepting";
+        }
+        tex += "] (" + state + ")";
+        if (lastVar != "") {
+            tex += " [right=of " + lastVar + "]";
+        }
+        tex += " {$" + state + "$};\n";
+        lastVar = state;
+    });
+    automParse.states.forEach(function (stateFrom) {
+        automParse.states.forEach(function (stateTo) {
+            if (automParse.function2.hasOwnProperty(stateFrom) && automParse.function2[stateFrom].hasOwnProperty(stateTo)) {
+                tex += "\\path[->";
+                if (stateFrom == stateTo) {
+                    tex += ",loop above";
+                }
+                tex += "] (" + stateFrom + ") edge node[above]{$" + arrToString(automParse.function2[stateFrom][stateTo]) + "$} (" + stateTo + ");\n";
+            }
+        })
+    });
+    tex += "\\end{tikzpicture}\n\\caption{Nicht deterministischer Automat}\n\\label{fig:automat}\n\\end{figure}";
+    out.innerText = tex;
+}
+
+function arrToString(arr) {
+    var txt = "";
+    arr.forEach(function (elem) {
+        txt += elem + ", ";
+    });
+    txt = txt.substr(0, txt.length - 2);
+    return txt;
+}
+
+function checkWordAutom() {
+    var word = txtWord.value;
+    if (!automParse.hasOwnProperty("states") || !automParse.hasOwnProperty("type") || !automParse.hasOwnProperty("alphabet") || !automParse.hasOwnProperty("function") || !automParse.hasOwnProperty("accept") || !automParse.hasOwnProperty("start")) {
+        return;
+    }
+    if (automParse.type != "DFA") {
+        out.innerText = "The Automata isn't deterministic. So it can't be used to chekc words.";
+        return;
+    }
+    var state = automParse.start;
+    word.split('').forEach(function (c) {
+        if (automParse.alphabet.indexOf(c) < 0) {
+            console.error("Word contains non-terminal chars");
+            return;
+        }
+        state = automParse.function[state][c];
+        if (!state) {
+            console.error("There was an unexpected symbol!");
+            return;
+        }
+    });
+    if (automParse.accept.indexOf(state) >= 0) {
+        out.innerText = "Word is accepted by automata";
+    } else {
+        out.innerText = "Word is NOT accepted by automata";
+    }
+}
+
+/*//Old implementation of toLatex:
 function toLatex(automat) {
     if (!grParse.hasOwnProperty("variables") || !grParse.hasOwnProperty("rules") || !grParse.hasOwnProperty("alphabet") || !grParse.hasOwnProperty("start")) {
         return;
@@ -129,3 +217,4 @@ function toLatex(automat) {
     tex += "\\end{tikzpicture}\n\\caption{Nicht deterministischer Automat}\n\\label{fig:automat}\n\\end{figure}";
     out.innerText = tex;
 }
+*/
