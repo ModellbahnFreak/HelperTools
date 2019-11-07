@@ -40,6 +40,7 @@ function parse() {
     btnLatex.disabled = "disabled";
     btnDraw.disabled = "";
     btnDerivate.disabled = "";
+    btnCheckGrammar.disabled = "";
     if (grParse.type == 3) {
         btnGramToAutom.disabled = "";
     }

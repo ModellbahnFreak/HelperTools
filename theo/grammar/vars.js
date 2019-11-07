@@ -12,6 +12,7 @@ var btnGramToAutom = null;
 var btnCheckAutom = null;
 var btnCheckGrammar = null;
 var txtWord = null;
+var btnParseAutom = null;
 var grParse = {};
 var producedWords = [];
 var automParse = {};
@@ -31,11 +32,14 @@ function init() {
     btnCheckAutom = document.getElementById("btnCheckAutom");
     txtWord = document.getElementById("txtWord");
     btnCheckGrammar = document.getElementById("btnCheckGrammar");
+    btnParseAutom = document.getElementById("btnParseAutom");
 
     btnDraw.disabled = "disabled";
     btnDerivate.disabled = "disabled";
     btnLatex.disabled = "disabled";
     btnGramToAutom.disabled = "disabled";
+    btnCheckAutom.disabled = "disabled";
+    btnCheckGrammar.disabled = "disabled";
     txtGrammar.addEventListener("change", grammarChange);
     txtVars.addEventListener("change", grammarChange);
     btnParse.addEventListener("click", parse);
@@ -55,4 +59,5 @@ function init() {
     btnGramToAutom.addEventListener("click", grmmarToAutomata);
     btnCheckAutom.addEventListener("click", checkWordAutom);
     btnCheckGrammar.addEventListener("click", checkWordGrammar);
+    btnParseAutom.addEventListener("click", parseAutomata);
 }

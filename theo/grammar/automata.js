@@ -78,6 +78,7 @@ function grmmarToAutomata() {
     out.innerText = "Converted Grammar to automata.\nTha automata is of type: " + automParse.type;
 
     btnLatex.disabled = "";
+    btnCheckAutom.disabled = "";
 }
 
 function toLatex(automat) {
