@@ -32,5 +32,6 @@
         "b"
     ],
     "start": "S",
-    "type": 1
+    "type": 1,
+    "isUnique": true
 }

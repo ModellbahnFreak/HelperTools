@@ -1,0 +1,20 @@
+{
+    "word": "abc",
+    "history": [
+        {
+            "word": "aBC",
+            "from": "S",
+            "to": "aBC"
+        },
+        {
+            "word": "abC",
+            "from": "B",
+            "to": "b"
+        },
+        {
+            "word": "abc",
+            "from": "C",
+            "to": "c"
+        }
+    ]
+}

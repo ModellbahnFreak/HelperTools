@@ -1,3 +1,13 @@
+<!--
+(c) 2019 ModellbahnFreak
+This tool was created by ModellbahnFreak (the author)(https://github.com/ModellbahnFreak) and published via Github
+(https://modellbahnfreak.github.io/HelperTools/theo/grammar/). Usage of the project and/or it's sources (this also
+includes parts of it) without the permission on ModellbahnFreak is not allowed! Furtuermore, the author doesn't take
+any responsibilities for anything (especially not concerning this tool). The result calculated by this tool might be
+inacurate or wrong. The author doesn't claim, that they are correct either. If the results are used, they should be
+checked with care!
+-->
+
 <!DOCTYPE html>
 <html lang="de">
 
@@ -9,6 +19,8 @@
     <script src="parseGrammar.js"></script>
     <script src="automata.js"></script>
     <script src="derivate.js"></script>
+    <script src="parseAutomata.js"></script>
+    <script src="syntaxTree.js"></script>
     <title>Automata to LaTeX</title>
 </head>
 
@@ -16,12 +28,15 @@
     Variables/non-terminal symbols:<br>
     <input type="text" name="txtVars" id="txtVars" value="S,T,F"><br>
     Production rules:<br>
-    <textarea name="grammar" id="grammar" cols="30" rows="10">S-aT|bF,T-bF|b,F-aT|a</textarea><br>
+    <textarea name="grammar" id="grammar" cols="30" rows="10"></textarea><br>
     Grammar: <button type="button" id="btnParse">Parse</button>
-    <button type="button" id="btnGramToAutom">To Automata</button><br>
-    <button type="button" id="btnDerivate">Derivate</button> <input type="number" id="numDerivate" value="1"
-        style="width:47px;"> times; Max. word length:<input type="number" id="numMaxLen" value="-1"
-        style="width:47px;"><br>
+    <button type="button" id="btnGramToAutom">To Automata</button>
+    <button type="button" id="btnCheckUnique">Check unique</button><br>
+    Derivate <input type="number" id="numDerivate" value="1" style="width:47px;"> times; Max. word length:<input
+        type="number" id="numMaxLen" value="-1" style="width:47px;">
+    <button type="button" id="btnDerivate">All</button>
+    <button type="button" id="btnDerivateLeft">Left derivation</button><br>
+    Syntax tree: <input type="text" id="txtTreeWord"><button type="button" id="btnSyntaxLatex">To LaTeX</button><br>
     Automata: <button type="button" id="btnParseAutom">Parse Automata</button>
     <button type="button" id="btnDraw">Draw</button>
     <button type="button" id="btnLatex">To LaTeX</button><br>
