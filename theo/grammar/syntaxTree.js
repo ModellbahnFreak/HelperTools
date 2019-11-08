@@ -44,7 +44,36 @@ function historyToSyntaxTreeLeft(history) {
     index++;
     var lowestChildren = [synTree];
     history.forEach(element => {
-        var changedBranch = null;
+        var lowestIndxElem = null;
+        lowestChildren.forEach(child => {
+            if (child.char == element.from) {
+                if (lowestIndxElem == null || child.index < lowestIndxElem.index) {
+                    lowestIndxElem = child;
+                }
+            }
+        });
+        var newChildren = [];
+        element.to.split('').forEach(c => {
+            var next = { "char": c, "index": index, "children": [] };
+            index++;
+            lowestIndxElem.children.push(next);
+            newChildren.push(next);
+        });
+        var lstPos = lowestChildren.indexOf(lowestIndxElem);
+        if (lstPos > 0) {
+            lowestChildren.splice(lstPos, 1);
+        }
+        lowestChildren = lowestChildren.concat(newChildren);
+    });
+    //console.log(synTree);
+    return synTree;
+}
+
+//For normal derivate: add changed index and index shift ti history, when building syntax tree change all idexes of elements with indexes larger than the change index
+function historyToSyntaxTree(history) {
+    var synTree = { "char": grParse.start, "index": 0, "children": [] };
+    var lowestChildren = [synTree];
+    history.forEach(element => {
         var lowestIndxElem = null;
         lowestChildren.forEach(child => {
             if (child.char == element.from) {

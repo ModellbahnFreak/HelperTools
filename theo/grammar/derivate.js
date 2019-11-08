@@ -20,6 +20,8 @@ function derivate(lenData) {
         producedWords = {};
         producedWords[grParse.start] = 0;
         lastLevelProduced = [grParse.start];
+        wordProcuctions = [];
+        wordProcuctions.push({ "word": grParse.start, "history": [] });
         lastDerivMode = 0;
         thisLevel = 0;
     }
@@ -29,6 +31,7 @@ function derivate(lenData) {
         thisLevel++;
         foundWords = false;
         var newProduced = [];
+        var newProductions = [];
         lastLevelProduced.forEach(function (word) {
             grParse.rules.forEach(function (rule) {
                 if (rule.hasOwnProperty("from") && rule.hasOwnProperty("to")) {
@@ -41,6 +44,10 @@ function derivate(lenData) {
                                     if (producedWords[newWord] == undefined) {
                                         newProduced.push(newWord);
                                         producedWords[newWord] = thisLevel;
+                                        var oldHistory = findSameWord({ "word": word, "history": { length: -1 } })[0].history;
+                                        var newHistory = oldHistory.concat({ "word": newWord, "from": rule.from, "to": rightSide.str, "index": fromPos, "idxShift": (rightSide.str.length - rule.from.length) });
+                                        var history = { "word": newWord, "history": newHistory };
+                                        newProductions.push(history);
                                     }
                                 }
                             }
@@ -51,6 +58,7 @@ function derivate(lenData) {
             });
         });
         if (newProduced.length > 0) {
+            wordProcuctions = wordProcuctions.concat(newProductions);
             lastLevelProduced = newProduced;
             foundWords = true;
         }
@@ -62,7 +70,7 @@ function derivate(lenData) {
     gui.out.innerText += "Found " + Object.keys(producedWords).length + "\n";
     gui.out.innerText += Object.keys(producedWords);
 
-    setEnableSyntaxTree(false);
+    setEnableSyntaxTree(true);
 
     /*var end = new Date();
     console.log(end - start);*/
@@ -113,7 +121,7 @@ function leftDerivation(lenData) {
                             if (maxLen == -1 || word.length - leftmostNonTermRule.from.length + rightSide.str.length <= maxLen) {
                                 var newWord = word.substr(0, leftmostNonTermPos) + rightSide.str + word.substr(leftmostNonTermPos + leftmostNonTermRule.from.length);
                                 var oldHistory = production.history;
-                                var newHistory = oldHistory.concat({ "word": newWord, "from": leftmostNonTermRule.from, "to": rightSide.str });
+                                var newHistory = oldHistory.concat({ "word": newWord, "from": leftmostNonTermRule.from, "to": rightSide.str, "index": leftmostNonTermPos, "idxShift": (rightSide.str.length - leftmostNonTermRule.from.length) });
                                 var history = { "word": newWord, "history": newHistory };
 
                                 if (containsNonTerminals(newWord) || producedWords[newWord] == undefined) {
@@ -123,6 +131,7 @@ function leftDerivation(lenData) {
                                     if (grParse.isUnique) {
                                         var differentH = findSameWord(history, newProduced);
                                         if (differentH.length > 0) {
+                                            newProduced.push(history);
                                             gui.out.innerText += "Not unique!\n";
                                             grParse.isUnique = false;
                                             grParse["notUniqueExample"] = [newHistory, differentH[0].history];

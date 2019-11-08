@@ -36,6 +36,8 @@ function grmmarToAutomata() {
     }
     automParse.states.push(endState);
 
+    automParse.states.push("Fail")
+
     automParse["accept"] = [];
     automParse.accept.push(endState);
 
@@ -43,6 +45,7 @@ function grmmarToAutomata() {
     automParse["function"] = {};
     automParse["function2"] = {};
     grParse.rules.forEach(function (rule) {
+        var missingChars = automParse.alphabet.concat();
         rule.to.forEach(function (right) {
             //Add first state as accepting state, if it leads to epsilon
             if (rule.from == grParse.start && right.str.length == 0) {
@@ -82,7 +85,57 @@ function grmmarToAutomata() {
             } else {
                 automParse.function2[rule.from][newState] = [nonTer];
             }
+
+            var added = missingChars.indexOf(nonTer);
+            if (added >= 0) {
+                missingChars.splice(added, 1);
+            }
         });
+
+        missingChars.forEach(c => {
+            if (!automParse.function.hasOwnProperty(rule.from)) {
+                automParse.function[rule.from] = {};
+            }
+            automParse.function[rule.from][c] = "Fail";
+            if (!automParse.function2.hasOwnProperty(rule.from)) {
+                automParse.function2[rule.from] = {};
+            }
+            if (automParse.function2[rule.from].hasOwnProperty("Fail")) {
+                automParse.function2[rule.from]["Fail"].push(c);
+            } else {
+                automParse.function2[rule.from]["Fail"] = [c];
+            }
+        });
+    });
+
+    automParse.alphabet.forEach(c => {
+        if (!automParse.function.hasOwnProperty(endState)) {
+            automParse.function[endState] = {};
+        }
+        automParse.function[endState][c] = "Fail";
+        if (!automParse.function2.hasOwnProperty(endState)) {
+            automParse.function2[endState] = {};
+        }
+        if (automParse.function2[endState].hasOwnProperty("Fail")) {
+            automParse.function2[endState]["Fail"].push(c);
+        } else {
+            automParse.function2[endState]["Fail"] = [c];
+        }
+    });
+
+    automParse.alphabet.forEach(c => {
+        if (!automParse.function.hasOwnProperty("Fail")) {
+            automParse.function["Fail"] = {};
+        }
+        automParse.function["Fail"][c] = "Fail";
+        if (!automParse.function2.hasOwnProperty("Fail")) {
+            automParse.function2["Fail"] = {};
+        }
+        if (automParse.function2["Fail"].hasOwnProperty("Fail")) {
+            automParse.function2["Fail"]["Fail"].push(c);
+        } else {
+            automParse.function2["Fail"]["Fail"] = [c];
+        }
     });
 
     gui.out.innerText = "Converted Grammar to automata.\nTha automata is of type: " + automParse.type;
@@ -140,26 +193,47 @@ function checkWordAutom() {
     if (!automParse.hasOwnProperty("states") || !automParse.hasOwnProperty("type") || !automParse.hasOwnProperty("alphabet") || !automParse.hasOwnProperty("function") || !automParse.hasOwnProperty("accept") || !automParse.hasOwnProperty("start")) {
         return;
     }
-    if (automParse.type != "DFA") {
-        gui.out.innerText = "The Automata isn't deterministic. So it can't be used to check words.";
+    if (automParse.type != "DFA" && automParse.type != "NFA") {
+        gui.out.innerText = "The Automata isn't of a known type. So it can't be used to check words.";
         return;
     }
-    var state = automParse.start;
+    var state = [automParse.start];
     word.split('').forEach(function (c) {
         if (automParse.alphabet.indexOf(c) < 0) {
-            console.error("Word contains non-terminal chars");
+            gui.out.innerText = "Word contains non-terminal chars";
+            state = [];
             return;
         }
-        state = automParse.function[state][c];
-        if (!state) {
-            console.error("There was an unexpected symbol!");
-            return;
+        var allStatesNew = [];
+        state.forEach(fromState => {
+            var newStates = automParse.function[fromState][c];
+            if (!newStates) {
+                console.error("There was an unexpected symbol!");
+                return;
+            }
+            allStatesNew = allStatesNew.concat(newStates);
+        });
+        state = [];
+        allStatesNew.forEach(s => {
+            if (state.indexOf(s) < 0) {
+                state.push(s);
+            }
+        });
+    });
+    var accepted = false;
+    state.forEach(s => {
+        if (!accepted) {
+            if (automParse.accept.indexOf(s) >= 0) {
+                accepted = true;
+            }
         }
     });
-    if (automParse.accept.indexOf(state) >= 0) {
-        gui.out.innerText = "Word is accepted by automata";
-    } else {
-        gui.out.innerText = "Word is NOT accepted by automata";
+    if (state.length > 0) {
+        if (accepted) {
+            gui.out.innerText = "Word is accepted by automata";
+        } else {
+            gui.out.innerText = "Word is NOT accepted by automata";
+        }
     }
 }
 
