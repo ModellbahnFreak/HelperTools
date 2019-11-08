@@ -74,22 +74,26 @@ function historyToSyntaxTree(history) {
     var synTree = { "char": grParse.start, "index": 0, "children": [] };
     var lowestChildren = [synTree];
     history.forEach(element => {
-        var lowestIndxElem = null;
+        var editEmelent = null;
         lowestChildren.forEach(child => {
-            if (child.char == element.from) {
-                if (lowestIndxElem == null || child.index < lowestIndxElem.index) {
-                    lowestIndxElem = child;
-                }
+            if (child.index == element.index) {
+                editEmelent = child;
+            } else if (child.index > element.index) {
+                child.index += element.idxShift;
             }
         });
         var newChildren = [];
+        var index = element.index;
         element.to.split('').forEach(c => {
             var next = { "char": c, "index": index, "children": [] };
             index++;
-            lowestIndxElem.children.push(next);
+            editEmelent.children.push(next);
             newChildren.push(next);
         });
-        var lstPos = lowestChildren.indexOf(lowestIndxElem);
+        if (index - element.index != element.idxShift) {
+            console.log("Shift wasn't correct: " + (index - element.index) + " soll: " + element.idxShift)
+        }
+        var lstPos = lowestChildren.indexOf(editEmelent);
         if (lstPos > 0) {
             lowestChildren.splice(lstPos, 1);
         }
