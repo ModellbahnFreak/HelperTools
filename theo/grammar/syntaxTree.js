@@ -11,30 +11,33 @@ checked with care!
 function syntaxLatex() {
     var word = txtTreeWord.value;
     if (producedWords[word] == undefined) {
-        gui.out.innerText = "The word you entered wasn't yet produced or is no part of the lanuage. You have to derivate until the word was produced!";
+        gui.out.value = "The word you entered wasn't yet produced or is no part of the lanuage. You have to derivate until the word was produced!";
         return;
     }
+
+    var index = 0;
+    function syntaxTreeBranchToLatex(branch) {
+        var tex = "node[] (" + index + ") {" + branch.char + "}";
+        index++;
+        if (branch.children.length > 0) {
+            branch.children.forEach(child => {
+                tex += " child {\n" + syntaxTreeBranchToLatex(child) + "}";
+            });
+        }
+        tex += "\n";
+        return tex;
+    }
+
     var tex = "";
     var productions = findSameWord({ "word": word, "history": { "length": -1 } });
     productions.forEach(production => {
-        var synTree = historyToSyntaxTreeLeft(production.history);
+        var synTree = historyToSyntaxTree(production.history);
         tex += "\\begin{tikzpicture}[level/.style ={sibling distance=30mm/#1}]\n";
         tex += "\\" + syntaxTreeBranchToLatex(synTree);
         tex = tex.substr(0, tex.length - 1) + ";\n";
         tex += "\\end{tikzpicture}\n\n\n";
     });
-    gui.out.innerText = tex;
-}
-
-function syntaxTreeBranchToLatex(branch) {
-    var tex = "node[] (" + branch.index + ") {" + branch.char + "}";
-    if (branch.children.length > 0) {
-        branch.children.forEach(child => {
-            tex += " child {\n" + syntaxTreeBranchToLatex(child) + "}";
-        });
-    }
-    tex += "\n";
-    return tex;
+    gui.out.value = tex;
 }
 
 //ONLY WORKS FOR HISTORIES CREATED BY LEFT DERIVATION
@@ -90,6 +93,7 @@ function historyToSyntaxTree(history) {
             editEmelent.children.push(next);
             newChildren.push(next);
         });
+        index--;
         if (index - element.index != element.idxShift) {
             console.log("Shift wasn't correct: " + (index - element.index) + " soll: " + element.idxShift)
         }
@@ -163,9 +167,9 @@ function historyToSyntaxTree(history) {
 function displayUnique() {
     if (lastDerivMode == 1) {
         if (grParse.isUnique) {
-            gui.out.innerText = "Propably unique. This is not certain. It's only checked with the currently known left derivations. To increase certaincy, create more left derivations. Currently known left derivations: " + producedWords.length;
+            gui.out.value = "Propably unique. This is not certain. It's only checked with the currently known left derivations. To increase certaincy, create more left derivations. Currently known left derivations: " + producedWords.length;
         } else {
-            gui.out.innerText = "The grammar isn't unique! This is sure.";
+            gui.out.value = "The grammar isn't unique! This is sure.";
             if (grParse.hasOwnProperty("notUniqueExample")) {
                 var h1 = grParse.notUniqueExample[0];
                 var h2 = grParse.notUniqueExample[1];
@@ -179,10 +183,10 @@ function displayUnique() {
                     txt += elem.word + "=>";
                 });
                 txt = txt.substr(0, txt.length - 2);
-                gui.out.innerText += " Example: \n" + txt;
+                gui.out.value += " Example: \n" + txt;
             }
         }
     } else {
-        gui.out.innerText = "To check if the grammar is unique, please create enough left derivations. Currently no left derivations are created";
+        gui.out.value = "To check if the grammar is unique, please create enough left derivations. Currently no left derivations are created";
     }
 }

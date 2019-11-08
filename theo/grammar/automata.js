@@ -13,7 +13,7 @@ function grmmarToAutomata() {
         return;
     }
     if (grParse.type != 3) {
-        gui.out.innerText = "The given grammar is not of type 3 so an automata can't be drawn!";
+        gui.out.value = "The given grammar is not of type 3 so an automata can't be drawn!";
         return;
     }
     automParse = {};
@@ -138,7 +138,7 @@ function grmmarToAutomata() {
         }
     });
 
-    gui.out.innerText = "Converted Grammar to automata.\nTha automata is of type: " + automParse.type;
+    gui.out.value = "Converted Grammar to automata.\nTha automata is of type: " + automParse.type;
 
     setEnableAutomata(true);
 }
@@ -176,7 +176,7 @@ function toLatex(automat) {
         })
     });
     tex += "\\end{tikzpicture}\n\\caption{Nicht deterministischer Automat}\n\\label{fig:automat}\n\\end{figure}";
-    gui.out.innerText = tex;
+    gui.out.value = tex;
 }
 
 function arrToString(arr) {
@@ -194,13 +194,13 @@ function checkWordAutom() {
         return;
     }
     if (automParse.type != "DFA" && automParse.type != "NFA") {
-        gui.out.innerText = "The Automata isn't of a known type. So it can't be used to check words.";
+        gui.out.value = "The Automata isn't of a known type. So it can't be used to check words.";
         return;
     }
     var state = [automParse.start];
     word.split('').forEach(function (c) {
         if (automParse.alphabet.indexOf(c) < 0) {
-            gui.out.innerText = "Word contains non-terminal chars";
+            gui.out.value = "Word contains non-terminal chars";
             state = [];
             return;
         }
@@ -230,9 +230,9 @@ function checkWordAutom() {
     });
     if (state.length > 0) {
         if (accepted) {
-            gui.out.innerText = "Word is accepted by automata";
+            gui.out.value = "Word is accepted by automata";
         } else {
-            gui.out.innerText = "Word is NOT accepted by automata";
+            gui.out.value = "Word is NOT accepted by automata";
         }
     }
 }
@@ -243,7 +243,7 @@ function toLatex(automat) {
         return;
     }
     if (grParse.type != 3) {
-        gui.out.innerText = "The given grammar is not of type 3 so an automata can't be drawn!";
+        gui.out.value = "The given grammar is not of type 3 so an automata can't be drawn!";
         return;
     }
     var tex = "\\begin{figure}[!h]\n\\centering\n\\begin{tikzpicture}[initial text={}]\n";
@@ -299,6 +299,6 @@ function toLatex(automat) {
         });
     });
     tex += "\\end{tikzpicture}\n\\caption{Nicht deterministischer Automat}\n\\label{fig:automat}\n\\end{figure}";
-    gui.out.innerText = tex;
+    gui.out.value = tex;
 }
 */

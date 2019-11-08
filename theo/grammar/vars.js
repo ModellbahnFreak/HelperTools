@@ -50,6 +50,9 @@ function init() {
     gui.btnJsonGrammar.addEventListener("click", stringToGrammar);
     gui.btnStringAutom.addEventListener("click", automataToString);
     gui.btnJsonAutom.addEventListener("click", stringToAutomata);
+    gui.btnStringSyntaxTree.addEventListener("click", syntaxTreeToString);
+    gui.btnJsonSyntaxTree.addEventListener("click", stringToSyntaxTree);
+    btnCopyClipboard.addEventListener("click", copyOutToClipboard)
 }
 
 function setEnableParser(on) {
@@ -84,7 +87,7 @@ function setEnableGrammar(on) {
 
 function setEnableAutomata(on) {
     if (on) {
-        gui.btnDraw.disabled = "";
+        //gui.btnDraw.disabled = "";
         gui.btnLatex.disabled = "";
         gui.btnCheckAutom.disabled = "";
         gui.btnStringAutom.disabled = "";
@@ -100,7 +103,7 @@ function setEnableSyntaxTree(on) {
     if (on) {
         gui.btnSyntaxLatex.disabled = "";
         gui.btnStringSyntaxTree.disabled = "";
-        gui.btnJsonSyntaxTree.disabled = "";
+        //gui.btnJsonSyntaxTree.disabled = "";
     } else {
         gui.btnSyntaxLatex.disabled = "disabled";
         gui.btnStringSyntaxTree.disabled = "disabled";
@@ -134,4 +137,10 @@ function loadDerivateParams() {
         maxLen = -1;
     }
     return [anzDeriv, maxLen];
+}
+
+function copyOutToClipboard() {
+    gui.out.select();
+    gui.out.setSelectionRange(0, 999999);
+    document.execCommand("copy");
 }

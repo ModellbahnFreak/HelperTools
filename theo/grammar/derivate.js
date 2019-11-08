@@ -63,14 +63,12 @@ function derivate(lenData) {
             foundWords = true;
         }
     }
-    gui.out.innerText = "";
+    gui.out.value = "";
     if (!foundWords) {
-        gui.out.innerText += "Finished! No more words found\n";
+        gui.out.value += "Finished! No more words found\n";
     }
-    gui.out.innerText += "Found " + Object.keys(producedWords).length + "\n";
-    gui.out.innerText += Object.keys(producedWords);
-
-    setEnableSyntaxTree(true);
+    gui.out.value += "Found " + Object.keys(producedWords).length + "\n";
+    gui.out.value += Object.keys(producedWords);
 
     /*var end = new Date();
     console.log(end - start);*/
@@ -93,7 +91,7 @@ function leftDerivation(lenData) {
         thisLevel = 0;
     }
 
-    gui.out.innerText = "";
+    gui.out.value = "";
 
     var foundWords = true;
     for (var i = 0; i < anzDeriv && foundWords; i++) {
@@ -132,7 +130,7 @@ function leftDerivation(lenData) {
                                         var differentH = findSameWord(history, newProduced);
                                         if (differentH.length > 0) {
                                             newProduced.push(history);
-                                            gui.out.innerText += "Not unique!\n";
+                                            gui.out.value += "Not unique!\n";
                                             grParse.isUnique = false;
                                             grParse["notUniqueExample"] = [newHistory, differentH[0].history];
                                         }
@@ -152,12 +150,11 @@ function leftDerivation(lenData) {
         }
     }
     if (!foundWords) {
-        gui.out.innerText += "Finished! No more words found with left derivation\n";
+        gui.out.value += "Finished! No more words found with left derivation\n";
     }
-    gui.out.innerText += "Found " + Object.keys(producedWords).length + "\n";
-    gui.out.innerText += Object.keys(producedWords);
+    gui.out.value += "Found " + Object.keys(producedWords).length + "\n";
+    gui.out.value += Object.keys(producedWords);
 
-    setEnableSyntaxTree(true);
 }
 
 function containsNonTerminals(word) {
@@ -214,9 +211,9 @@ function findSameWord(h, otherList) {
 
 function checkWordGrammar() {
     if (producedWords[txtWord.value] != undefined) {
-        gui.out.innerText = "The word was found in the language.";
+        gui.out.value = "The word was found in the language.";
         return;
     } else {
-        gui.out.innerText = "The word wasn't found in with the known derivates. This doesn't mean, that the word isn't in the language. The more often you derivate, the higher the certaincy is that it's not contained";
+        gui.out.value = "The word wasn't found in with the known derivates. This doesn't mean, that the word isn't in the language. The more often you derivate, the higher the certaincy is that it's not contained";
     }
 }

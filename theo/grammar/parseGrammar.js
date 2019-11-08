@@ -14,6 +14,7 @@ function grammarChange() {
 
 function parse() {
     grParse = {};
+    lastDerivMode = -1;
 
     var variables = txtVars.value;
     var grStr = txtGrammar.value;
@@ -44,11 +45,12 @@ function parse() {
 
     getType();
 
-    gui.out.innerHTML = "Parsed grammar: <br>" + grammarToStr();
+    gui.out.innerHTML = "Parsed grammar: \n" + grammarToStr();
 
     setEnableParser(false);
     setEnableGrammar(true);
     setEnableToAutomata(grParse.type == 3);
+    setEnableSyntaxTree(grParse.type >= 2);
 }
 
 function addToGrammar(left, right) {
@@ -113,7 +115,7 @@ function grammarToStr() {
         txt += nonTer + ", ";
     });
     txt = txt.substr(0, txt.length - 2);
-    txt += "<br>Production rules: ";
+    txt += "\nProduction rules: ";
     grParse.rules.forEach(function (rule) {
         if (rule.hasOwnProperty("from") && rule.hasOwnProperty("to")) {
             txt += rule.from + "&rarr;";
@@ -127,14 +129,14 @@ function grammarToStr() {
         }
     });
     txt = txt.substr(0, txt.length - 2);
-    txt += "<br>Alphabet: ";
+    txt += "\nAlphabet: ";
     grParse.alphabet.forEach(function (ter) {
         txt += ter + ", ";
     });
     txt = txt.substr(0, txt.length - 2);
-    txt += "<br>Start symbol: " + grParse.start;
+    txt += "\nStart symbol: " + grParse.start;
 
-    txt += "<br>Type: " + grParse.type;
+    txt += "\nType: " + grParse.type;
     return txt;
 }
 
@@ -149,17 +151,17 @@ function getType() {
     var type = 3;
     grParse.rules.forEach(function (rule) {
         if (rule.hasOwnProperty("from") && rule.hasOwnProperty("to")) {
-            if (rule.from.length > 1 || grParse.variables.indexOf(rule.from) < 0) {
+            if (type > 1 && (rule.from.length > 1 || grParse.variables.indexOf(rule.from) < 0)) {
                 type = 1;
             }
             rule.to.forEach(function (rightSide) {
                 if (rightSide.hasOwnProperty("str")) {
                     if (!epsilonRuleApplies(rule.from, rightSide.str)) {
-                        if (rightSide.str.length < rule.from.length) {
+                        if (type > 0 && (rightSide.str.length < rule.from.length)) {
                             type = 0;
-                        } else if (rightSide.str.length < 1 || rightSide.str.length > 2
+                        } else if (type > 2 && (rightSide.str.length < 1 || rightSide.str.length > 2
                             || grParse.alphabet.indexOf(rightSide.str.charAt(0)) < 0
-                            || (rightSide.str.length == 2 && grParse.variables.indexOf(rightSide.str.charAt(1)) < 0)) {
+                            || (rightSide.str.length == 2 && grParse.variables.indexOf(rightSide.str.charAt(1)) < 0))) {
                             type = 2;
                         }
                     }
@@ -172,22 +174,23 @@ function getType() {
 
 function epsilonRuleApplies(from, to) {
     if (to.length == 0 && from == grParse.start) {
+        var applies = true;
         grParse.rules.forEach(function (rule) {
             rule.to.forEach(function (rightSide) {
                 if (rightSide.str.indexOf(from) >= 0) {
-                    return false;
+                    applies = false;
                 }
             });
         });
         console.log("epsilon rule aplies");
-        return true;
+        return applies;
     }
     return false;
 }
 
 function parseErr(e) {
     if (e) {
-        gui.out.innerText = "Error while parsing: " + e;
+        gui.out.value = "Error while parsing: " + e;
         console.error(e);
     }
     setEnableOnlyParser();

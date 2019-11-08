@@ -9,7 +9,7 @@ checked with care!
 */
 
 function grammarToString() {
-    gui.out.innerText = JSON.stringify(grParse);
+    gui.out.value = JSON.stringify(grParse);
 }
 
 function stringToGrammar() {
@@ -20,7 +20,7 @@ function stringToGrammar() {
         return;
     }
 
-    gui.out.innerHTML = "Parsed grammar: <br>" + grammarToStr();
+    gui.out.value = "Parsed grammar: \n" + grammarToStr();
 
     setEnableParser(false);
     setEnableGrammar(true);
@@ -28,9 +28,24 @@ function stringToGrammar() {
 }
 
 function automataToString() {
-    gui.out.innerText = JSON.stringify(automParse);
+    gui.out.value = JSON.stringify(automParse);
 }
 
 function stringToAutomata() {
     automParse = JSON.parse(gui.txtGrammar);
+}
+
+function syntaxTreeToString() {
+    var words = findSameWord({ "word": gui.txtTreeWord.value, "history": { "length": -1 } });
+    if (words.length <= 0) {
+        gui.out.value = "Please enter a word which was already derivated into the Text box next to to \"Syntax tree:\"!";
+        return;
+    }
+    words.forEach(w => {
+        gui.out.value += JSON.stringify(historyToSyntaxTree(w.history)) + "\n\n";
+    })
+}
+
+function stringToSyntaxTree() {
+    gui.out.value = "Currently not available.";
 }
