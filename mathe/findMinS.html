@@ -5,15 +5,17 @@
 </head>
 
 <body>
-    n=<input type="number" id="x">*a + <input type="number" id="y">*b <br>
+    s=<input type="number" id="x">*a + <input type="number" id="y">*b <br>
     <button type="button" onclick="calc();">Rechnen</button><br>
     <span id="erg"></span>
     <script>
         var last = -1;
+        var x = parseInt(document.getElementById("x").value);
+        var y = parseInt(document.getElementById("y").value);
         for (var i = 0; i < 100; i++) {
             for (var a = 0; a < i; a++) {
                 for (var b = 0; b < i; b++) {
-                    if (i == 5 * a + 7 * b) {
+                    if (i == x * a + y * b) {
                         document.body.innerText += i + "\n";
                     }
                 }
