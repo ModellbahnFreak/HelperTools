@@ -13,7 +13,7 @@ function grmmarToAutomata() {
         return;
     }
     if (grParse.type != 3) {
-        out.innerText = "The given grammar is not of type 3 so an automata can't be drawn!";
+        gui.out.innerText = "The given grammar is not of type 3 so an automata can't be drawn!";
         return;
     }
     automParse = {};
@@ -40,8 +40,8 @@ function grmmarToAutomata() {
     automParse.accept.push(endState);
 
     automParse["type"] = "DFA";
-    automParse["function"] = [];
-    automParse["function2"] = [];
+    automParse["function"] = {};
+    automParse["function2"] = {};
     grParse.rules.forEach(function (rule) {
         rule.to.forEach(function (right) {
             //Add first state as accepting state, if it leads to epsilon
@@ -85,10 +85,9 @@ function grmmarToAutomata() {
         });
     });
 
-    out.innerText = "Converted Grammar to automata.\nTha automata is of type: " + automParse.type;
+    gui.out.innerText = "Converted Grammar to automata.\nTha automata is of type: " + automParse.type;
 
-    btnLatex.disabled = "";
-    btnCheckAutom.disabled = "";
+    setEnableAutomata(true);
 }
 
 function toLatex(automat) {
@@ -124,7 +123,7 @@ function toLatex(automat) {
         })
     });
     tex += "\\end{tikzpicture}\n\\caption{Nicht deterministischer Automat}\n\\label{fig:automat}\n\\end{figure}";
-    out.innerText = tex;
+    gui.out.innerText = tex;
 }
 
 function arrToString(arr) {
@@ -142,7 +141,7 @@ function checkWordAutom() {
         return;
     }
     if (automParse.type != "DFA") {
-        out.innerText = "The Automata isn't deterministic. So it can't be used to chekc words.";
+        gui.out.innerText = "The Automata isn't deterministic. So it can't be used to check words.";
         return;
     }
     var state = automParse.start;
@@ -158,9 +157,9 @@ function checkWordAutom() {
         }
     });
     if (automParse.accept.indexOf(state) >= 0) {
-        out.innerText = "Word is accepted by automata";
+        gui.out.innerText = "Word is accepted by automata";
     } else {
-        out.innerText = "Word is NOT accepted by automata";
+        gui.out.innerText = "Word is NOT accepted by automata";
     }
 }
 
@@ -170,7 +169,7 @@ function toLatex(automat) {
         return;
     }
     if (grParse.type != 3) {
-        out.innerText = "The given grammar is not of type 3 so an automata can't be drawn!";
+        gui.out.innerText = "The given grammar is not of type 3 so an automata can't be drawn!";
         return;
     }
     var tex = "\\begin{figure}[!h]\n\\centering\n\\begin{tikzpicture}[initial text={}]\n";
@@ -226,6 +225,6 @@ function toLatex(automat) {
         });
     });
     tex += "\\end{tikzpicture}\n\\caption{Nicht deterministischer Automat}\n\\label{fig:automat}\n\\end{figure}";
-    out.innerText = tex;
+    gui.out.innerText = tex;
 }
 */

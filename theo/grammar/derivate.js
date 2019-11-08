@@ -8,8 +8,10 @@ inacurate or wrong. The author doesn't claim, that they are correct either. If t
 checked with care!
 */
 
-function derivate(anzDeriv, maxLen, leftDerivation) {
+function derivate(lenData) {
     //var start = new Date();
+    var anzDeriv = lenData[0];
+    var maxLen = lenData[1];
     if (!grParse.hasOwnProperty("variables") || !grParse.hasOwnProperty("rules") || !grParse.hasOwnProperty("alphabet") || !grParse.hasOwnProperty("start")) {
         return;
     }
@@ -53,18 +55,20 @@ function derivate(anzDeriv, maxLen, leftDerivation) {
             foundWords = true;
         }
     }
-    out.innerText = "";
+    gui.out.innerText = "";
     if (!foundWords) {
-        out.innerText += "Finished! No more words found\n";
+        gui.out.innerText += "Finished! No more words found\n";
     }
-    out.innerText += "Found " + Object.keys(producedWords).length + "\n";
-    out.innerText += Object.keys(producedWords);
+    gui.out.innerText += "Found " + Object.keys(producedWords).length + "\n";
+    gui.out.innerText += Object.keys(producedWords);
 
     /*var end = new Date();
     console.log(end - start);*/
 }
 
-function leftDerivation(anzDeriv, maxLen) {
+function leftDerivation(lenData) {
+    var anzDeriv = lenData[0];
+    var maxLen = lenData[1];
     if (!grParse.hasOwnProperty("variables") || !grParse.hasOwnProperty("rules") || !grParse.hasOwnProperty("alphabet") || !grParse.hasOwnProperty("start")) {
         return;
     }
@@ -79,7 +83,7 @@ function leftDerivation(anzDeriv, maxLen) {
         thisLevel = 0;
     }
 
-    out.innerText = "";
+    gui.out.innerText = "";
 
     var foundWords = true;
     for (var i = 0; i < anzDeriv && foundWords; i++) {
@@ -117,7 +121,7 @@ function leftDerivation(anzDeriv, maxLen) {
                                     if (grParse.isUnique) {
                                         var differentH = findSameWord(history, newProduced);
                                         if (differentH.length > 0) {
-                                            out.innerText += "Not unique!\n";
+                                            gui.out.innerText += "Not unique!\n";
                                             grParse.isUnique = false;
                                             grParse["notUniqueExample"] = [newHistory, differentH[0].history];
                                         }
@@ -137,10 +141,10 @@ function leftDerivation(anzDeriv, maxLen) {
         }
     }
     if (!foundWords) {
-        out.innerText += "Finished! No more words found with left derivation\n";
+        gui.out.innerText += "Finished! No more words found with left derivation\n";
     }
-    out.innerText += "Found " + Object.keys(producedWords).length + "\n";
-    out.innerText += Object.keys(producedWords);
+    gui.out.innerText += "Found " + Object.keys(producedWords).length + "\n";
+    gui.out.innerText += Object.keys(producedWords);
 }
 
 function containsNonTerminals(word) {
@@ -196,29 +200,10 @@ function findSameWord(h, otherList) {
 }
 
 function checkWordGrammar() {
-    var word = txtWord.value;
-
-    var notFoundReason = 2;//not found; 2: too short; 0: found
-    producedWords.forEach(function (w) {
-        if (w == word) {
-            out.innerText = "The word was found in the language.";
-            notFoundReason = 0;
-            return;
-        }
-        if (w.length >= word.length) {
-            notFoundReason = 1;
-        }
-    });
-    if (notFoundReason == 2) {
-        out.innerText = "The word wasn't found in the list of known derivates. Try derivating at least untill the length of the derivates matches your word.";
-        if (grParse.hasOwnProperty("type")) {
-            if (grParse.type > 0) {
-                out.innerText = "Trying to create more derivates to potentially find the word. Pleas wait.";
-                derivate(7, word.length);
-            }
-            checkWordGrammar();
-        }
-    } else if (notFoundReason == 1) {
-        out.innerText = "The word wasn't found in with the known derivates. This means with a high probability that the word isn't in the language. But it's not for sure!";
+    if (producedWords[txtWord.value] != undefined) {
+        gui.out.innerText = "The word was found in the language.";
+        return;
+    } else {
+        gui.out.innerText = "The word wasn't found in with the known derivates. This doesn't mean, that the word isn't in the language. The more often you derivate, the higher the certaincy is that it's not contained";
     }
 }

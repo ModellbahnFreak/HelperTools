@@ -8,25 +8,7 @@ inacurate or wrong. The author doesn't claim, that they are correct either. If t
 checked with care!
 */
 
-var out = null;
-var svg = null;
-var txtGrammar = null;
-var txtVars = null;
-var numDerivate = null;
-var numMaxLen = null;
-var btnParse = null;
-var btnDraw = null;
-var btnDerivate = null;
-var btnLatex = null;
-var btnGramToAutom = null;
-var btnCheckAutom = null;
-var btnCheckGrammar = null;
-var txtWord = null;
-var btnParseAutom = null;
-var btnDerivateLeft = null;
-var btnSyntaxLatex = null;
-var txtTreeWord = null;
-var btnCheckUnique = null;
+var gui = {};
 var grParse = {};
 var producedWords = {};
 var automParse = {};
@@ -36,63 +18,120 @@ var thisLevel = 0;
 var lastDerivMode = -1;//0: normal, 1: left
 
 function init() {
-    out = document.getElementById("outText");
-    svg = document.getElementById("svg");
-    txtGrammar = document.getElementById("grammar");
-    txtVars = document.getElementById("txtVars");
-    btnParse = document.getElementById("btnParse");
-    btnDraw = document.getElementById("btnDraw");
-    btnDerivate = document.getElementById("btnDerivate");
-    btnLatex = document.getElementById("btnLatex");
-    numDerivate = document.getElementById("numDerivate");
-    numMaxLen = document.getElementById("numMaxLen");
-    btnGramToAutom = document.getElementById("btnGramToAutom");
-    btnCheckAutom = document.getElementById("btnCheckAutom");
-    txtWord = document.getElementById("txtWord");
-    btnCheckGrammar = document.getElementById("btnCheckGrammar");
-    btnParseAutom = document.getElementById("btnParseAutom");
-    btnDerivateLeft = document.getElementById("btnDerivateLeft");
-    btnSyntaxLatex = document.getElementById("btnSyntaxLatex");
-    txtTreeWord = document.getElementById("txtTreeWord");
-    btnCheckUnique = document.getElementById("btnCheckUnique");
+    var allElems = document.getElementsByTagName("*");
+    for (var i = 0; i < allElems.length; i++) {
+        gui[allElems[i].id] = allElems[i];
+    }
 
-    btnDraw.disabled = "disabled";
-    btnDerivate.disabled = "disabled";
-    btnLatex.disabled = "disabled";
-    btnGramToAutom.disabled = "disabled";
-    btnCheckAutom.disabled = "disabled";
-    btnCheckGrammar.disabled = "disabled";
-    txtGrammar.addEventListener("change", grammarChange);
-    txtVars.addEventListener("change", grammarChange);
-    btnParse.addEventListener("click", parse);
-    btnDraw.addEventListener("click", draw);
-    btnDerivate.addEventListener("click", function () {
-        var anzDeriv = parseInt(numDerivate.value);
-        if (!(anzDeriv > 0)) {
-            anzDeriv = 1;
-        }
-        var maxLen = parseInt(numMaxLen.value);
-        if (!(maxLen > -1)) {
-            maxLen = -1;
-        }
-        derivate(anzDeriv, maxLen);
+    setEnableParser(true);
+    setEnableSyntaxTree(false);
+    setEnableAutomata(false);
+    setEnableGrammar(false);
+    setEnableToAutomata(false);
+
+    gui.txtGrammar.addEventListener("change", grammarChange);
+    gui.txtVars.addEventListener("change", grammarChange);
+    gui.btnParse.addEventListener("click", parse);
+    gui.btnDraw.addEventListener("click", draw);
+    gui.btnDerivate.addEventListener("click", function () {
+        derivate(loadDerivateParams());
     });
-    btnLatex.addEventListener("click", toLatex);
-    btnGramToAutom.addEventListener("click", grmmarToAutomata);
-    btnCheckAutom.addEventListener("click", checkWordAutom);
-    btnCheckGrammar.addEventListener("click", checkWordGrammar);
-    btnParseAutom.addEventListener("click", parseAutomata);
-    btnDerivateLeft.addEventListener("click", function () {
-        var anzDeriv = parseInt(numDerivate.value);
-        if (!(anzDeriv > 0)) {
-            anzDeriv = 1;
-        }
-        var maxLen = parseInt(numMaxLen.value);
-        if (!(maxLen > -1)) {
-            maxLen = -1;
-        }
-        leftDerivation(anzDeriv, maxLen);
+    gui.btnLatex.addEventListener("click", toLatex);
+    gui.btnGramToAutom.addEventListener("click", grmmarToAutomata);
+    gui.btnCheckAutom.addEventListener("click", checkWordAutom);
+    gui.btnCheckGrammar.addEventListener("click", checkWordGrammar);
+    gui.btnParseAutom.addEventListener("click", parseAutomata);
+    gui.btnDerivateLeft.addEventListener("click", function () {
+        leftDerivation(loadDerivateParams());
     });
-    btnSyntaxLatex.addEventListener("click", syntaxLatex);
-    btnCheckUnique.addEventListener("click", displayUnique);
+    gui.btnSyntaxLatex.addEventListener("click", syntaxLatex);
+    gui.btnCheckUnique.addEventListener("click", displayUnique);
+    gui.btnStringGrammar.addEventListener("click", grammarToString);
+    gui.btnJsonGrammar.addEventListener("click", stringToGrammar);
+    gui.btnStringAutom.addEventListener("click", automataToString);
+    gui.btnJsonAutom.addEventListener("click", stringToAutomata);
+}
+
+function setEnableParser(on) {
+    if (on) {
+        gui.btnParse.disabled = "";
+        gui.btnParseAutom.disabled = "";
+        gui.btnJsonGrammar.disabled = "";
+        gui.btnJsonAutom.disabled = "";
+    } else {
+        gui.btnParse.disabled = "disabled";
+        gui.btnParseAutom.disabled = "disabled";
+        gui.btnJsonGrammar.disabled = "disabled";
+        gui.btnJsonAutom.disabled = "disabled";
+    }
+}
+
+function setEnableGrammar(on) {
+    if (on) {
+        gui.btnCheckUnique.disabled = "";
+        gui.btnDerivate.disabled = "";
+        gui.btnDerivateLeft.disabled = "";
+        gui.btnCheckGrammar.disabled = "";
+        gui.btnStringGrammar.disabled = "";
+    } else {
+        gui.btnCheckUnique.disabled = "disabled";
+        gui.btnDerivate.disabled = "disabled";
+        gui.btnDerivateLeft.disabled = "disabled";
+        gui.btnCheckGrammar.disabled = "disabled";
+        gui.btnStringGrammar.disabled = "disabled";
+    }
+}
+
+function setEnableAutomata(on) {
+    if (on) {
+        gui.btnDraw.disabled = "";
+        gui.btnLatex.disabled = "";
+        gui.btnCheckAutom.disabled = "";
+        gui.btnStringAutom.disabled = "";
+    } else {
+        gui.btnDraw.disabled = "disabled";
+        gui.btnLatex.disabled = "disabled";
+        gui.btnCheckAutom.disabled = "disabled";
+        gui.btnStringAutom.disabled = "disabled";
+    }
+}
+
+function setEnableSyntaxTree(on) {
+    if (on) {
+        gui.btnSyntaxLatex.disabled = "";
+        gui.btnStringSyntaxTree.disabled = "";
+        gui.btnJsonSyntaxTree.disabled = "";
+    } else {
+        gui.btnSyntaxLatex.disabled = "disabled";
+        gui.btnStringSyntaxTree.disabled = "disabled";
+        gui.btnJsonSyntaxTree.disabled = "disabled";
+    }
+}
+
+function setEnableToAutomata(on) {
+    if (on) {
+        gui.btnGramToAutom.disabled = "";
+    } else {
+        gui.btnGramToAutom.disabled = "disabled";
+    }
+}
+
+function setEnableOnlyParser() {
+    setEnableAutomata(false);
+    setEnableGrammar(false);
+    setEnableSyntaxTree(false);
+    setEnableToAutomata(false);
+    setEnableParser(true);
+}
+
+function loadDerivateParams() {
+    var anzDeriv = parseInt(numDerivate.value);
+    if (!(anzDeriv > 0)) {
+        anzDeriv = 1;
+    }
+    var maxLen = parseInt(numMaxLen.value);
+    if (!(maxLen > -1)) {
+        maxLen = -1;
+    }
+    return [anzDeriv, maxLen];
 }

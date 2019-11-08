@@ -9,7 +9,7 @@ checked with care!
 */
 
 function grammarChange() {
-    btnParse.disabled = "";
+    setEnableParser(true);
 }
 
 function parse() {
@@ -44,17 +44,11 @@ function parse() {
 
     getType();
 
-    out.innerHTML = "Parsed grammar: <br>" + grammarToStr();
-    producedWords = [grParse.start];
+    gui.out.innerHTML = "Parsed grammar: <br>" + grammarToStr();
 
-    btnParse.disabled = "disabled";
-    btnLatex.disabled = "disabled";
-    btnDraw.disabled = "";
-    btnDerivate.disabled = "";
-    btnCheckGrammar.disabled = "";
-    if (grParse.type == 3) {
-        btnGramToAutom.disabled = "";
-    }
+    setEnableParser(false);
+    setEnableGrammar(true);
+    setEnableToAutomata(grParse.type == 3);
 }
 
 function addToGrammar(left, right) {
@@ -193,9 +187,8 @@ function epsilonRuleApplies(from, to) {
 
 function parseErr(e) {
     if (e) {
+        gui.out.innerText = "Error while parsing: " + e;
         console.error(e);
     }
-    btnDraw.disabled = "disabled";
-    btnDerivate.disabled = "disabled";
-    btnLatex.disabled = "disabled";
+    setEnableOnlyParser();
 }

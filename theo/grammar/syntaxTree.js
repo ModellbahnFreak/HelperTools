@@ -11,7 +11,7 @@ checked with care!
 function syntaxLatex() {
     /*var word = txtTreeWord.value;
     if (producedWords.indexOf(word) < 0 || !wordProcuctions.hasOwnProperty(word)) {
-        out.innerText = "The word you entered wasn't yet produced or is no part of the lanuage. You have to derivate until the word was produced!";
+        gui.out.innerText = "The word you entered wasn't yet produced or is no part of the lanuage. You have to derivate until the word was produced!";
         return;
     }
     var tex = "";
@@ -24,11 +24,11 @@ function syntaxLatex() {
             tex += "\\node[] (" + nameIdx + ") {" + history[0].word + "} child {"
         });
     });
-    out.innerText = tex;*/
+    gui.out.innerText = tex;*/
 }
 
 function historyToSyntaxTree(history) {
-    /*var synTree = { "char": grParse.start, "children": [] };
+    var synTree = { "char": grParse.start, "children": [] };
     var lowestChildren = [synTree];
     history.forEach(element => {
         var changedBranch = null;
@@ -37,7 +37,7 @@ function historyToSyntaxTree(history) {
 
             }
         });
-    });*/
+    });
 }
 
 /*
@@ -100,9 +100,9 @@ function historyToSyntaxTree(history) {
 function displayUnique() {
     if (lastDerivMode == 1) {
         if (grParse.isUnique) {
-            out.innerText = "Propably unique. This is not certain. It's only checked with the currently known left derivations. To increase certaincy, create more left derivations. Currently known left derivations: " + producedWords.length;
+            gui.out.innerText = "Propably unique. This is not certain. It's only checked with the currently known left derivations. To increase certaincy, create more left derivations. Currently known left derivations: " + producedWords.length;
         } else {
-            out.innerText = "The grammar isn't unique! This is sure.";
+            gui.out.innerText = "The grammar isn't unique! This is sure.";
             if (grParse.hasOwnProperty("notUniqueExample")) {
                 var h1 = grParse.notUniqueExample[0];
                 var h2 = grParse.notUniqueExample[1];
@@ -116,10 +116,10 @@ function displayUnique() {
                     txt += elem.word + "=>";
                 });
                 txt = txt.substr(0, txt.length - 2);
-                out.innerText += " Example: \n" + txt;
+                gui.out.innerText += " Example: \n" + txt;
             }
         }
     } else {
-        out.innerText = "To check if the grammar is unique, please create enough left derivations. Currently no left derivations are created";
+        gui.out.innerText = "To check if the grammar is unique, please create enough left derivations. Currently no left derivations are created";
     }
 }
