@@ -62,6 +62,8 @@ function derivate(lenData) {
     gui.out.innerText += "Found " + Object.keys(producedWords).length + "\n";
     gui.out.innerText += Object.keys(producedWords);
 
+    setEnableSyntaxTree(false);
+
     /*var end = new Date();
     console.log(end - start);*/
 }
@@ -145,6 +147,8 @@ function leftDerivation(lenData) {
     }
     gui.out.innerText += "Found " + Object.keys(producedWords).length + "\n";
     gui.out.innerText += Object.keys(producedWords);
+
+    setEnableSyntaxTree(true);
 }
 
 function containsNonTerminals(word) {

@@ -1,0 +1,39 @@
+{
+    "char": "S",
+    "index": 0,
+    "children": [
+        {
+            "char": "C",
+            "index": 1,
+            "children": [
+                {
+                    "char": "c",
+                    "index": 6,
+                    "children": []
+                }
+            ]
+        },
+        {
+            "char": "B",
+            "index": 2,
+            "children": [
+                {
+                    "char": "b",
+                    "index": 4,
+                    "children": []
+                }
+            ]
+        },
+        {
+            "char": "C",
+            "index": 3,
+            "children": [
+                {
+                    "char": "c",
+                    "index": 5,
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

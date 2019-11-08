@@ -9,35 +9,65 @@ checked with care!
 */
 
 function syntaxLatex() {
-    /*var word = txtTreeWord.value;
-    if (producedWords.indexOf(word) < 0 || !wordProcuctions.hasOwnProperty(word)) {
+    var word = txtTreeWord.value;
+    if (producedWords[word] == undefined) {
         gui.out.innerText = "The word you entered wasn't yet produced or is no part of the lanuage. You have to derivate until the word was produced!";
         return;
     }
     var tex = "";
     var productions = findSameWord({ "word": word, "history": { "length": -1 } });
     productions.forEach(production => {
-        var nameIdx = 0;
-        tex += "\\begin{tikzpicture}[level/.style ={sibling distance=30mm/#1}]";
-        var history = production.history;
-        history.forEach(element => {
-            tex += "\\node[] (" + nameIdx + ") {" + history[0].word + "} child {"
-        });
+        var synTree = historyToSyntaxTreeLeft(production.history);
+        tex += "\\begin{tikzpicture}[level/.style ={sibling distance=30mm/#1}]\n";
+        tex += "\\" + syntaxTreeBranchToLatex(synTree);
+        tex = tex.substr(0, tex.length - 1) + ";\n";
+        tex += "\\end{tikzpicture}\n\n\n";
     });
-    gui.out.innerText = tex;*/
+    gui.out.innerText = tex;
 }
 
-function historyToSyntaxTree(history) {
-    var synTree = { "char": grParse.start, "children": [] };
+function syntaxTreeBranchToLatex(branch) {
+    var tex = "node[] (" + branch.index + ") {" + branch.char + "}";
+    if (branch.children.length > 0) {
+        branch.children.forEach(child => {
+            tex += " child {\n" + syntaxTreeBranchToLatex(child) + "}";
+        });
+    }
+    tex += "\n";
+    return tex;
+}
+
+//ONLY WORKS FOR HISTORIES CREATED BY LEFT DERIVATION
+function historyToSyntaxTreeLeft(history) {
+    var index = 0;
+    var synTree = { "char": grParse.start, "index": index, "children": [] };
+    index++;
     var lowestChildren = [synTree];
     history.forEach(element => {
         var changedBranch = null;
+        var lowestIndxElem = null;
         lowestChildren.forEach(child => {
             if (child.char == element.from) {
-
+                if (lowestIndxElem == null || child.index < lowestIndxElem.index) {
+                    lowestIndxElem = child;
+                }
             }
         });
+        var newChildren = [];
+        element.to.split('').forEach(c => {
+            var next = { "char": c, "index": index, "children": [] };
+            index++;
+            lowestIndxElem.children.push(next);
+            newChildren.push(next);
+        });
+        var lstPos = lowestChildren.indexOf(lowestIndxElem);
+        if (lstPos > 0) {
+            lowestChildren.splice(lstPos, 1);
+        }
+        lowestChildren = lowestChildren.concat(newChildren);
     });
+    //console.log(synTree);
+    return synTree;
 }
 
 /*
