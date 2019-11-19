@@ -36,7 +36,7 @@ function grmmarToAutomata() {
     }
     automParse.states.push(endState);
 
-    automParse.states.push("Fail")
+    //automParse.states.push("Fail")
 
     automParse["accept"] = [];
     automParse.accept.push(endState);
@@ -92,7 +92,7 @@ function grmmarToAutomata() {
             }
         });
 
-        missingChars.forEach(c => {
+        /*missingChars.forEach(c => {
             if (!automParse.function.hasOwnProperty(rule.from)) {
                 automParse.function[rule.from] = {};
             }
@@ -105,10 +105,10 @@ function grmmarToAutomata() {
             } else {
                 automParse.function2[rule.from]["Fail"] = [c];
             }
-        });
+        });*/
     });
 
-    automParse.alphabet.forEach(c => {
+    /*automParse.alphabet.forEach(c => {
         if (!automParse.function.hasOwnProperty(endState)) {
             automParse.function[endState] = {};
         }
@@ -136,7 +136,7 @@ function grmmarToAutomata() {
         } else {
             automParse.function2["Fail"]["Fail"] = [c];
         }
-    });
+    });*/
 
     gui.out.value = "Converted Grammar to automata.\nTha automata is of type: " + automParse.type;
 
@@ -235,6 +235,149 @@ function checkWordAutom() {
             gui.out.value = "Word is NOT accepted by automata";
         }
     }
+}
+
+function nfaToDfa() {
+    if (!automParse.hasOwnProperty("states") || !automParse.hasOwnProperty("function2") || !automParse.hasOwnProperty("accept") || !automParse.hasOwnProperty("start")) {
+        return;
+    }
+    if (automParse.type != "NFA") {
+        gui.out.value = "The Automata isn't a NFA. So it can't be converted to a DFA.";
+        return;
+    }
+
+    var newStart = [];
+    newStart = newStart.concat(automParse.start);
+
+    var newStates = pot(automParse.states);
+    var newAccept = [];
+    for (var i = 0; i < newStates.length; i++) {
+        for (var a = 0; a < automParse.accept.length; a++) {
+            if (newStates[i].indexOf(automParse.accept[a]) > 0) {
+                newAccept.push(newStates[i]);
+            }
+        }
+    }
+
+
+    var statesToCheck = [newStart];
+    var statesChecked = [];
+    var newFunction = {};
+    var newFunction2 = {};
+    while (statesToCheck.length > 0) {
+        var nextCheck = [];
+        statesToCheck.forEach(function (state) {
+            if (!arrInArr(statesChecked, state)) {
+                automParse.alphabet.forEach(function (c) {
+                    var toState = [];
+                    state.forEach(function (subState) {
+                        if (automParse.function.hasOwnProperty(subState)) {
+                            if (automParse.function[subState].hasOwnProperty(c)) {
+                                toState = toState.concat(automParse.function[subState][c]);
+                            }
+                        }
+                    });
+                    var stateStr = setToStr(state);
+                    var toStateStr = setToStr(toState);
+                    if (!newFunction.hasOwnProperty(stateStr)) {
+                        newFunction[stateStr] = {};
+                    }
+                    newFunction[stateStr][c] = toStateStr;
+                    if (!newFunction2.hasOwnProperty(stateStr)) {
+                        newFunction2[stateStr] = {};
+                    }
+                    if (newFunction2[stateStr].hasOwnProperty(toStateStr)) {
+                        newFunction2[stateStr][toStateStr].push(c);
+                    } else {
+                        newFunction2[stateStr][toStateStr] = [c];
+                    }
+                    nextCheck.push(toState);
+                });
+                statesChecked.push(state);
+            }
+        });
+        statesToCheck = nextCheck;
+    }
+    /*newStates.forEach(function (state) {
+        automParse.alphabet.forEach(function (c) {
+            var toState = [];
+            state.forEach(function (subState) {
+                toState = toState.concat(automParse.function[subState][c]);
+            });
+            var stateStr = setToStr(state);
+            var toStateStr = setToStr(toState);
+            if (!newFunction.hasOwnProperty(stateStr)) {
+                newFunction[stateStr] = {};
+            }
+            newFunction[stateStr][c] = toStateStr;
+            if (!newFunction2.hasOwnProperty(stateStr)) {
+                newFunction2[stateStr] = {};
+            }
+            if (newFunction2[stateStr].hasOwnProperty(toStateStr)) {
+                newFunction2[stateStr][toStateStr].push(c);
+            } else {
+                newFunction2[stateStr][toStateStr] = [c];
+            }
+        });
+    });*/
+
+    automParse.states = [];
+    statesChecked.forEach(function (s) {
+        automParse.states.push(setToStr(s));
+    });
+    automParse.start = setToStr(newStart);
+    automParse.accept = newAccept;
+    automParse.function = newFunction;
+    automParse.function2 = newFunction2;
+    automParse.type = "DFA";
+    automataToString();
+}
+
+function arrInArr(haystack, needle) {
+    var erg = false;
+    haystack.forEach(function (arr) {
+        if (!erg) {
+            if (arr.length == needle.length) {
+                var same = true;
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i] != needle[i]) {
+                        same = false;
+                        return;
+                    }
+                }
+                if (same) {
+                    erg = true;
+                }
+            }
+        }
+    });
+    return erg;
+}
+
+function pot(m) {
+    var erg = [];
+    for (var i = 0; i < Math.pow(2, m.length); i++) {
+        var element = [];
+        for (var a = 0; a < m.length; a++) {
+            if (i >> a & 1 == 1) {
+                element.push(m[a]);
+            }
+        }
+        erg.push(element);
+    }
+    return erg;
+}
+
+function setToStr(m) {
+    var str = "";
+    if (m instanceof Array) {
+        m.forEach(function (e) {
+            str += e;
+        });
+    } else {
+        str = m;
+    }
+    return str;
 }
 
 /*//Old implementation of toLatex:

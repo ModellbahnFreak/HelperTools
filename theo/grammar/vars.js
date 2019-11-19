@@ -52,7 +52,8 @@ function init() {
     gui.btnJsonAutom.addEventListener("click", stringToAutomata);
     gui.btnStringSyntaxTree.addEventListener("click", syntaxTreeToString);
     gui.btnJsonSyntaxTree.addEventListener("click", stringToSyntaxTree);
-    btnCopyClipboard.addEventListener("click", copyOutToClipboard)
+    gui.btnCopyClipboard.addEventListener("click", copyOutToClipboard);
+    gui.btnNfaDfa.addEventListener("click", nfaToDfa);
 }
 
 function setEnableParser(on) {
