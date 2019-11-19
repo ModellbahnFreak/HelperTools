@@ -16,8 +16,8 @@ function parse() {
     grParse = {};
     lastDerivMode = -1;
 
-    var variables = txtVars.value;
-    var grStr = txtGrammar.value;
+    var variables = gui.txtVars.value;
+    var grStr = gui.txtGrammar.value;
 
     grParse["variables"] = variables.replace(/,/g, ";").trim().split(";");
     if (grParse.variables.length <= 0) { parseErr(); return; }

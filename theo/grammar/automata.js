@@ -92,6 +92,10 @@ function grmmarToAutomata() {
             }
         });
 
+        if (missingChars.length > 0) {
+            automParse["type"] = "NFA";
+        }
+
         /*missingChars.forEach(c => {
             if (!automParse.function.hasOwnProperty(rule.from)) {
                 automParse.function[rule.from] = {};
@@ -141,6 +145,7 @@ function grmmarToAutomata() {
     gui.out.value = "Converted Grammar to automata.\nTha automata is of type: " + automParse.type;
 
     setEnableAutomata(true);
+    setEnableParser(false);
 }
 
 function toLatex(automat) {
@@ -150,32 +155,54 @@ function toLatex(automat) {
     var tex = "\\begin{figure}[!h]\n\\centering\n\\begin{tikzpicture}[initial text={}]\n";
     var lastVar = "";
     automParse.states.forEach(function (state) {
+        var stateStr = state;
+        if (stateStr == "") {
+            stateStr = "fail";
+        }
+
         tex += "\\node[state";
         if (automParse.start == state) {
             tex += ",initial";
+        } else if (automParse.start instanceof Array) {
+            if (automParse.start.indexOf(state) >= 0) {
+                tex += ",initial";
+            }
         }
         if (automParse.accept.indexOf(state) >= 0) {
             tex += ",accepting";
         }
-        tex += "] (" + state + ")";
+        tex += "] (" + stateStr + ")";
         if (lastVar != "") {
             tex += " [right=of " + lastVar + "]";
         }
-        tex += " {$" + state + "$};\n";
-        lastVar = state;
+
+        lastVar = stateStr;
+
+        if (stateStr == "fail") {
+            stateStr = "\\emptyset";
+        }
+        tex += " {$" + stateStr + "$};\n";
     });
     automParse.states.forEach(function (stateFrom) {
         automParse.states.forEach(function (stateTo) {
             if (automParse.function2.hasOwnProperty(stateFrom) && automParse.function2[stateFrom].hasOwnProperty(stateTo)) {
+                var stateFromStr = stateFrom;
+                var stateToStr = stateTo;
+                if (stateFromStr == "") {
+                    stateFromStr = "fail";
+                }
+                if (stateToStr == "") {
+                    stateToStr = "fail";
+                }
                 tex += "\\path[->";
                 if (stateFrom == stateTo) {
                     tex += ",loop above";
                 }
-                tex += "] (" + stateFrom + ") edge node[above]{$" + arrToString(automParse.function2[stateFrom][stateTo]) + "$} (" + stateTo + ");\n";
+                tex += "] (" + stateFromStr + ") edge node[above]{$" + arrToString(automParse.function2[stateFrom][stateTo]) + "$} (" + stateToStr + ");\n";
             }
         })
     });
-    tex += "\\end{tikzpicture}\n\\caption{Nicht deterministischer Automat}\n\\label{fig:automat}\n\\end{figure}";
+    tex += "\\end{tikzpicture}\n\\caption{Automat}\n\\label{fig:automat}\n\\end{figure}";
     gui.out.value = tex;
 }
 
@@ -250,15 +277,6 @@ function nfaToDfa() {
     newStart = newStart.concat(automParse.start);
 
     var newStates = pot(automParse.states);
-    var newAccept = [];
-    for (var i = 0; i < newStates.length; i++) {
-        for (var a = 0; a < automParse.accept.length; a++) {
-            if (newStates[i].indexOf(automParse.accept[a]) > 0) {
-                newAccept.push(newStates[i]);
-            }
-        }
-    }
-
 
     var statesToCheck = [newStart];
     var statesChecked = [];
@@ -320,6 +338,15 @@ function nfaToDfa() {
             }
         });
     });*/
+
+    var newAccept = [];
+    statesChecked.forEach(state => {
+        automParse.accept.forEach(accept => {
+            if (state.indexOf(accept) >= 0) {
+                newAccept.push(setToStr(state));
+            }
+        });
+    });
 
     automParse.states = [];
     statesChecked.forEach(function (s) {
