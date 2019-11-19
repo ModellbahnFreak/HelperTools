@@ -23,16 +23,20 @@ checked with care!
     <script src="syntaxTree.js"></script>
     <script src="saveLoad.js"></script>
     <title>Automata to LaTeX</title>
-    <link rel="prefetch"
+    <<link rel="prefetch"
         href="https://script.google.com/macros/s/AKfycbxbdpTFYejoEwOvt3KpTRZL0ZatpLZUaPHiWqkwawvnKzCzPl0/exec">
 </head>
 
 <body>
     Variables/non-terminal symbols:<br>
-    <input type="text" name="txtVars" id="txtVars" value="S,T,F"><br>
+    <input type="text" name="txtVars" id="txtVars" value=""><br>
     Production rules:<br>
-    <textarea name="grammar" id="txtGrammar" cols="30" rows="10">S-aT|bF,T-bF|b,F-aT|a</textarea><br>
-    <!--S-aT|bF,T-bF|b,F-aT|a-->
+    <a href="#" onclick="sampleGrammar();">Example for Grammar</a>
+    <a href="#" onclick="sampleAutomata();">Example for Automata</a><br>
+    (Everything after a '#' is ignored!)
+    <br>
+    <textarea name="grammar" id="txtGrammar" cols="150" rows="5"></textarea>
+    <br>
     Grammar:
     <button type="button" id="btnParse">Parse</button>
     <button type="button" id="btnGramToAutom">To Automata</button>

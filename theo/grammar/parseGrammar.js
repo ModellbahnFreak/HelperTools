@@ -17,7 +17,7 @@ function parse() {
     lastDerivMode = -1;
 
     var variables = gui.txtVars.value;
-    var grStr = gui.txtGrammar.value;
+    var grStr = gui.txtGrammar.value.replace(/#.*\n/g, "\n").replace(/#.*/g, "").trim();
 
     grParse["variables"] = variables.replace(/,/g, ";").trim().split(";");
     if (grParse.variables.length <= 0) { parseErr(); return; }
@@ -25,7 +25,7 @@ function parse() {
     grParse["isUnique"] = true;
 
     grStr = grStr.replace(/,/g, ";");
-    grStr = grStr.replace(/>/g, "");
+    grStr = grStr.replace(/>/g, "").replace(/=/g, "-");
     grStr = grStr.trim();
     var grList = grStr.split(";");
 

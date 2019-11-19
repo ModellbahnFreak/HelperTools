@@ -29,6 +29,8 @@ function init() {
     setEnableGrammar(false);
     setEnableToAutomata(false);
 
+    sampleGrammar();
+
     gui.txtGrammar.addEventListener("change", grammarChange);
     gui.txtVars.addEventListener("change", grammarChange);
     gui.btnParse.addEventListener("click", parse);
@@ -146,4 +148,16 @@ function copyOutToClipboard() {
     gui.out.select();
     gui.out.setSelectionRange(0, 999999);
     document.execCommand("copy");
+}
+
+function sampleGrammar() {
+    gui.txtVars.value = "S,T,F";
+    gui.txtGrammar.value = "S=>aT|bF,T=bF|b,F-aT|a #Production rules, it's possible to separate the two sides with -, ->, = or =>";
+    grammarChange();
+}
+
+function sampleAutomata() {
+    gui.txtVars.value = "S,T,F,Z";
+    gui.txtGrammar.value = "S #Starting state\nT,F #Accepting states\nS=>aT|bF,T=bF|bZ,F-aT|aZ #Function, separation as for automata, left side must be a state, right side a char and a state";
+    grammarChange();
 }

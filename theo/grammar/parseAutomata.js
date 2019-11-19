@@ -14,22 +14,23 @@ function parseAutomata() {
     automParse = {};
 
     var states = gui.txtVars.value.replace(/,/g, ";").trim().split(";");
-    var fnStr = gui.txtGrammar.value.trim();
+    var fnStr = gui.txtGrammar.value.trim().replace(/#.*\n/g, "\n").replace(/#.*/g, "").trim();
 
     automParse["states"] = states;
     if (automParse.states.length <= 0) {
         parseErr("You didn't specify any states");
         return;
     }
-    automParse["start"] = automParse.states[0];
 
     var lines = fnStr.split("\n");
-    if (lines.length != 2) {
-        parseErr("You didn't specify accepting states AND the function. (One line for each)");
+    if (lines.length < 3) {
+        parseErr("You didn't specify start states, accepting states AND the function. (One line for each)");
         return;
     }
-    var accepting = lines[0].replace(/,/g, ";").trim().split(";");
-    var functionStr = lines[1].replace(/,/g, ";").replace(/>/g, "").trim().split(";");
+    automParse["start"] = lines[0].replace(/,/g, ";").trim().split(";");
+
+    var accepting = lines[1].replace(/,/g, ";").trim().split(";");
+    var functionStr = lines[2].replace(/,/g, ";").replace(/>/g, "").replace(/=/g, "-").trim().split(";");
     var newFunction = {};
     var newFunction2 = {};
     var alphabet = [];
@@ -51,6 +52,7 @@ function parseAutomata() {
             to = to.trim();
             if (to.length < 2) {
                 success = false;
+                debugger;
                 parseErr("The to part must at least be one terminal and one non terminal");
                 return;
             }
