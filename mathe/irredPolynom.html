@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Irreduzibel finder</title>
+</head>
+
+<body>
+    Mod:<input type="number" id="modul">; Max deg:<input type="number" id="degree"><button type="button"
+        onclick="calc();">Calc</button><br>
+    <span id="out"></span>
+
+    <script>
+        var out = document.getElementById("out");
+        var modul = document.getElementById("modul");
+        var deg = document.getElementById("degree");
+        var f = function (x) { return 0; };
+        var fs = [];
+
+        function calc() {
+            var m = parseInt(modul.value);
+            out.innerText = "";
+            /*for (var p1 = 0; p1 < m; p1++) {
+                for (var p2 = 0; p2 < m; p2++) {
+                    for (var p3 = 0; p3 < m; p3++) {
+                        for (var p4 = 0; p4 < m; p4++) {
+                            f = function (x) { return p1 % m * (x ^ 3) % m + p2 % m * (x ^ 2) % m + p3 % m * (x ^ 1) % m + p4 % m; };
+                            if (!checkNullst(m)) {
+                                out.innerText += "f(X) = x^3+" + p2 + "x^2+" + p3 + "x^1+" + p4 + "\n";
+                            }
+                        }
+                    }
+                }
+            }*/
+            nextDegree(parseInt(deg.value), m, []);
+        }
+
+        function nextDegree(d, m, params) {
+            if (d > 0) {
+                for (var i = 0; i < m; i++) {
+                    var newP = params.concat(i);
+                    fs.push(nextDegree(d - 1, m, newP));
+                }
+            } else {
+                for (var i = 0; i < m; i++) {
+                    var newP = params.concat(i);
+                    f = function (x) {
+                        var y = 0;
+                        for (var a = newP.length - 1; a >= 0; a--) {
+                            y += newP[a] % m * (x ^ a) % m;
+                        }
+                        return y;
+                    };
+                    if (!checkNullst(m)) {
+                        out.innerText += "f(X) = ";
+                        for (var a = newP.length - 1; a >= 0; a--) {
+                            out.innerText += newP[a] + " \\cdot " + "x^" + a + " + ";
+                        }
+                        out.innerText += "\n";
+                    }
+                }
+            }
+        }
+
+        function checkNullst(m) {
+            for (var x = 0.0; x <= m; x += 0.01) {
+                if (f(x) == 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    </script>
+</body>
+
+</html>
