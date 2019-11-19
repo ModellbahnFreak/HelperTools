@@ -152,7 +152,8 @@ function copyOutToClipboard() {
 
 function sampleGrammar() {
     gui.txtVars.value = "S,T,F";
-    gui.txtGrammar.value = "S=>aT|bF,T=bF|b,F-aT|a #Production rules, it's possible to separate the two sides with -, ->, = or =>";
+    gui.txtGrammar.value = "S=>aT|bF #Production rules, it's possible to separate the two sides with -, ->, = or =>\n";
+    gui.txtGrammar.value += "T=bF|b #New lines are also allowed (only in grammars)\nF-aT|a";
     grammarChange();
 }
 

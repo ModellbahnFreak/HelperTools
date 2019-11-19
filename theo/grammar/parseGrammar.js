@@ -17,7 +17,7 @@ function parse() {
     lastDerivMode = -1;
 
     var variables = gui.txtVars.value;
-    var grStr = gui.txtGrammar.value.replace(/#.*\n/g, "\n").replace(/#.*/g, "").trim();
+    var grStr = gui.txtGrammar.value.replace(/#.*\n/g, "\n").replace(/#.*/g, "").replace(/\n/g, ",").trim();
 
     grParse["variables"] = variables.replace(/,/g, ";").trim().split(";");
     if (grParse.variables.length <= 0) { parseErr(); return; }
