@@ -92,11 +92,13 @@ function setEnableAutomata(on) {
         gui.btnLatex.disabled = "";
         gui.btnCheckAutom.disabled = "";
         gui.btnStringAutom.disabled = "";
+        gui.btnNfaDfa.disabled = "";
     } else {
         gui.btnDraw.disabled = "disabled";
         gui.btnLatex.disabled = "disabled";
         gui.btnCheckAutom.disabled = "disabled";
         gui.btnStringAutom.disabled = "disabled";
+        gui.btnNfaDfa.disabled = "disabled";
     }
 }
 
