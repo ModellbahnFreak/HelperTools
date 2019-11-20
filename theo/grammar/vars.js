@@ -15,6 +15,7 @@ var automParse = {};
 var automMemory = null;
 var wordProcuctions = [];
 var lastLevelProduced = [];
+var regex = null;
 var thisLevel = 0;
 var lastDerivMode = -1;//0: normal, 1: left
 
@@ -29,6 +30,7 @@ function init() {
     setEnableAutomata(false);
     setEnableGrammar(false);
     setEnableToAutomata(false);
+    setEnabledRegex(false);
 
     sampleGrammar();
 
@@ -58,6 +60,10 @@ function init() {
     gui.btnCopyClipboard.addEventListener("click", copyOutToClipboard);
     gui.btnNfaDfa.addEventListener("click", nfaToDfa);
     gui.btnProductautomata.addEventListener("click", productAutomata);
+    gui.btnParseRegex.addEventListener("click", saveRegex);
+    gui.btnCheckRegex.addEventListener("click", checkRegex);
+    gui.btnRegexToAutomata.addEventListener("click", regexToAutomata);
+    gui.btnRegexCreate.addEventListener("click", regexCreateWords);
 }
 
 function setEnableParser(on) {
@@ -66,11 +72,13 @@ function setEnableParser(on) {
         gui.btnParseAutom.disabled = "";
         gui.btnJsonGrammar.disabled = "";
         gui.btnJsonAutom.disabled = "";
+        gui.btnParseRegex.disabled = "";
     } else {
         gui.btnParse.disabled = "disabled";
         gui.btnParseAutom.disabled = "disabled";
         gui.btnJsonGrammar.disabled = "disabled";
         gui.btnJsonAutom.disabled = "disabled";
+        gui.btnParseRegex.disabled = "disabled";
     }
 }
 
@@ -125,6 +133,18 @@ function setEnableToAutomata(on) {
         gui.btnGramToAutom.disabled = "";
     } else {
         gui.btnGramToAutom.disabled = "disabled";
+    }
+}
+
+function setEnabledRegex(on) {
+    if (on) {
+        gui.btnCheckRegex.disabled = "";
+        gui.btnRegexToAutomata.disabled = "";
+        gui.btnRegexCreate.disabled = "";
+    } else {
+        gui.btnCheckRegex.disabled = "disabled";
+        gui.btnRegexToAutomata.disabled = "disabled";
+        gui.btnRegexCreate.disabled = "disabled";
     }
 }
 

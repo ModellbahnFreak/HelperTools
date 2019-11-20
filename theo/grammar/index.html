@@ -23,6 +23,7 @@ checked with care!
     <script src="syntaxTree.js"></script>
     <script src="saveLoad.js"></script>
     <script src="helperFunctions.js"></script>
+    <script src="regex.js"></script>
     <title>Automata to LaTeX</title>
     <link rel="prefetch"
         href="https://script.google.com/macros/s/AKfycbxbdpTFYejoEwOvt3KpTRZL0ZatpLZUaPHiWqkwawvnKzCzPl0/exec">
@@ -56,12 +57,18 @@ checked with care!
     <button type="button" id="btnProductautomata">Product Automata</button>
     <button type="button" id="btnLatex">To LaTeX</button><br>
     <input type="text" id="txtWord">
-    <button type="button" id="btnCheckAutom">Check word (a)</button>
-    <button type="button" id="btnCheckGrammar">Check word (g)</button><br>
+    <button type="button" id="btnCheckAutom">Check word (automata)</button>
+    <button type="button" id="btnCheckGrammar">Check word (grammar)</button>
+    <button type="button" id="btnCheckRegex">Check word (RegEx)</button><br>
+    Regular expressions:
+    <button type="button" id="btnParseRegex">Parse RegEx</button>
+    <button type="button" id="btnRegexToAutomata" style="display: none;">RegEx to Automata</button>
+    <button type="button" id="btnRegexCreate">Create words</button>
+    <br>
     To JSON-String:
     <button type="button" id="btnStringGrammar">Grammar</button>
     <button type="button" id="btnStringAutom">Automata</button>
-    <button type="button" id="btnStringSyntaxTree" disabled="disabled">Syntax Tree</button><br>
+    <button type="button" id="btnStringSyntaxTree" disabled="disabled">Syntax Tree</button>
     From JSON-String:
     <button type="button" id="btnJsonGrammar">Grammar</button>
     <button type="button" id="btnJsonAutom">Automata</button>
