@@ -32,7 +32,10 @@ function automataToString() {
 }
 
 function stringToAutomata() {
-    automParse = JSON.parse(gui.txtGrammar);
+    automParse = JSON.parse(gui.txtGrammar.value);
+    gui.out.value = "Successfully parsed automata of type " + automParse.type + " with " + automParse.states.length + " states.";
+    setEnableAutomata(true);
+    setEnableParser(false);
 }
 
 function syntaxTreeToString() {

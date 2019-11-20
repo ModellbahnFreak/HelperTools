@@ -8,10 +8,6 @@ inacurate or wrong. The author doesn't claim, that they are correct either. If t
 checked with care!
 */
 
-function grammarChange() {
-    setEnableParser(true);
-}
-
 function parse() {
     grParse = {};
     lastDerivMode = -1;
@@ -186,12 +182,4 @@ function epsilonRuleApplies(from, to) {
         return applies;
     }
     return false;
-}
-
-function parseErr(e) {
-    if (e) {
-        gui.out.value = "Error while parsing: " + e;
-        console.error(e);
-    }
-    setEnableOnlyParser();
 }

@@ -198,21 +198,12 @@ function toLatex(automat) {
                 if (stateFrom == stateTo) {
                     tex += ",loop above";
                 }
-                tex += "] (" + stateFromStr + ") edge node[above]{$" + arrToString(automParse.function2[stateFrom][stateTo]) + "$} (" + stateToStr + ");\n";
+                tex += "] (" + stateFromStr + ") edge node[above]{$" + arrToString(automParse.function2[stateFrom][stateTo], ", ") + "$} (" + stateToStr + ");\n";
             }
         })
     });
-    tex += "\\end{tikzpicture}\n\\caption{Automat}\n\\label{fig:automat}\n\\end{figure}";
+    tex += "\\end{tikzpicture}\n\\caption{Automat erstellt mit HelperTools (https://github.com/ModellbahnFreak/HelperTools/)}\n\\label{fig:automat}\n\\end{figure}";
     gui.out.value = tex;
-}
-
-function arrToString(arr) {
-    var txt = "";
-    arr.forEach(function (elem) {
-        txt += elem + ", ";
-    });
-    txt = txt.substr(0, txt.length - 2);
-    return txt;
 }
 
 function checkWordAutom() {
@@ -282,6 +273,7 @@ function nfaToDfa() {
     var statesChecked = [];
     var newFunction = {};
     var newFunction2 = {};
+    automParse.type = "DFA";
     while (statesToCheck.length > 0) {
         var nextCheck = [];
         statesToCheck.forEach(function (state) {
@@ -295,10 +287,14 @@ function nfaToDfa() {
                             }
                         }
                     });
-                    var stateStr = setToStr(state);
-                    var toStateStr = setToStr(toState);
+                    var stateStr = arrToString(state);
+                    var toStateStr = arrToString(toState);
                     if (!newFunction.hasOwnProperty(stateStr)) {
                         newFunction[stateStr] = {};
+                    }
+                    if (newFunction[stateStr].hasOwnProperty(c)) {
+                        automParse.type = "NFA";
+                        gui.out.value = "Converting to DFA didn't ork for some reason.";
                     }
                     newFunction[stateStr][c] = toStateStr;
                     if (!newFunction2.hasOwnProperty(stateStr)) {
@@ -322,8 +318,8 @@ function nfaToDfa() {
             state.forEach(function (subState) {
                 toState = toState.concat(automParse.function[subState][c]);
             });
-            var stateStr = setToStr(state);
-            var toStateStr = setToStr(toState);
+            var stateStr = arrToString(state);
+            var toStateStr = arrToString(toState);
             if (!newFunction.hasOwnProperty(stateStr)) {
                 newFunction[stateStr] = {};
             }
@@ -343,68 +339,99 @@ function nfaToDfa() {
     statesChecked.forEach(state => {
         automParse.accept.forEach(accept => {
             if (state.indexOf(accept) >= 0) {
-                newAccept.push(setToStr(state));
+                newAccept.push(arrToString(state));
             }
         });
     });
 
     automParse.states = [];
     statesChecked.forEach(function (s) {
-        automParse.states.push(setToStr(s));
+        automParse.states.push(arrToString(s));
     });
-    automParse.start = setToStr(newStart);
+    automParse.start = arrToString(newStart);
     automParse.accept = newAccept;
     automParse.function = newFunction;
     automParse.function2 = newFunction2;
-    automParse.type = "DFA";
-    automataToString();
+    if (automParse.type == "DFA") {
+        gui.out.value = "Conversion to DFA successfull.";
+    }
 }
 
-function arrInArr(haystack, needle) {
-    var erg = false;
-    haystack.forEach(function (arr) {
-        if (!erg) {
-            if (arr.length == needle.length) {
-                var same = true;
-                for (var i = 0; i < arr.length; i++) {
-                    if (arr[i] != needle[i]) {
-                        same = false;
-                        return;
+function productAutomata() {
+    if (automMemory == null && automParse != null) {
+        if (automParse.type != "DFA") {
+            gui.out.value = "Both automatas must be of type DFA to calculate the product automata.";
+            return
+        }
+        automMemory = automParse;
+        gui.out.value = "Current automata saved to memory. Please enter AND PARSE next one.";
+        gui.txtGrammar.value = "#Current automata saved to memory. Please enter AND PARSE next one.";
+        gui.txtVars.value = "";
+    } else if (automMemory != null && automParse != null) {
+        if (automParse.type != "DFA") {
+            gui.out.value = "Both automatas must be of type DFA to calculate the product automata.";
+            return;
+        }
+        if (!setEquals(automParse.alphabet, automMemory.alphabet)) {
+            gui.out.value = "Both automatas must have the same slphabet to calculate the product automata.";
+            return;
+        }
+        var statesNew = cartesianProd(automMemory.states, automParse.states);
+        var acceptNew = cartesianProd(automMemory.accept, automParse.accept);
+        var startNew = [automMemory.start, automParse.start];
+        var newFunction = {};
+        var newFunction2 = {};
+        statesNew.forEach(state => {
+            automParse.alphabet.forEach(c => {
+                var toState = [];
+                if (state.length == 2) {
+                    toState = [automMemory.function[state[0]][c], automParse.function[state[1]][c]];
+                }
+                var stateStr = arrToString(state);
+                var toStateStr = arrToString(toState);
+                if (!newFunction.hasOwnProperty(stateStr)) {
+                    newFunction[stateStr] = {};
+                }
+                if (newFunction[stateStr].hasOwnProperty(c)) {
+                    automParse.type = "NFA";
+                    gui.out.value = "The product automata is a NFA for some wierd reason.";
+                    if (newFunction[stateStr][c] instanceof Array) {
+                        newFunction[stateStr][c].push(toStateStr);
+                    } else {
+                        newFunction[stateStr][c] = [newFunction[stateStr][c], toStateStr];
                     }
+                } else {
+                    newFunction[stateStr][c] = toStateStr;
                 }
-                if (same) {
-                    erg = true;
+                if (!newFunction2.hasOwnProperty(stateStr)) {
+                    newFunction2[stateStr] = {};
                 }
-            }
-        }
-    });
-    return erg;
-}
-
-function pot(m) {
-    var erg = [];
-    for (var i = 0; i < Math.pow(2, m.length); i++) {
-        var element = [];
-        for (var a = 0; a < m.length; a++) {
-            if (i >> a & 1 == 1) {
-                element.push(m[a]);
-            }
-        }
-        erg.push(element);
-    }
-    return erg;
-}
-
-function setToStr(m) {
-    var str = "";
-    if (m instanceof Array) {
-        m.forEach(function (e) {
-            str += e;
+                if (newFunction2[stateStr].hasOwnProperty(toStateStr)) {
+                    newFunction2[stateStr][toStateStr].push(c);
+                } else {
+                    newFunction2[stateStr][toStateStr] = [c];
+                }
+            });
         });
-    } else {
-        str = m;
+        var statesNewStr = [];
+        statesNew.forEach(state => {
+            statesNewStr.push(arrToString(state));
+        });
+        var acceptNewStr = [];
+        acceptNew.forEach(state => {
+            acceptNewStr.push(arrToString(state));
+        });
+        automParse.states = statesNewStr;
+        automParse.accept = acceptNewStr;
+        automParse.start = arrToString(startNew)
+        automParse.function = newFunction;
+        automParse.function2 = newFunction2;
+        automMemory = null;
+        gui.out.value = "Product automata was successfully calculated";
+    } else if (automMemory != null && (automParse == null || automParse == automMemory)) {
+        automMemory = automParse;
+        gui.out.value = "You have to enter and succesfully parse another automat to be able to create the product automata";
     }
-    return str;
 }
 
 /*//Old implementation of toLatex:

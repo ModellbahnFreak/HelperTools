@@ -12,6 +12,7 @@ var gui = {};
 var grParse = {};
 var producedWords = {};
 var automParse = {};
+var automMemory = null;
 var wordProcuctions = [];
 var lastLevelProduced = [];
 var thisLevel = 0;
@@ -56,6 +57,7 @@ function init() {
     gui.btnJsonSyntaxTree.addEventListener("click", stringToSyntaxTree);
     gui.btnCopyClipboard.addEventListener("click", copyOutToClipboard);
     gui.btnNfaDfa.addEventListener("click", nfaToDfa);
+    gui.btnProductautomata.addEventListener("click", productAutomata);
 }
 
 function setEnableParser(on) {
@@ -95,12 +97,14 @@ function setEnableAutomata(on) {
         gui.btnCheckAutom.disabled = "";
         gui.btnStringAutom.disabled = "";
         gui.btnNfaDfa.disabled = "";
+        gui.btnProductautomata.disabled = "";
     } else {
         gui.btnDraw.disabled = "disabled";
         gui.btnLatex.disabled = "disabled";
         gui.btnCheckAutom.disabled = "disabled";
         gui.btnStringAutom.disabled = "disabled";
         gui.btnNfaDfa.disabled = "disabled";
+        gui.btnProductautomata.disabled = "disabled";
     }
 }
 
@@ -148,17 +152,4 @@ function copyOutToClipboard() {
     gui.out.select();
     gui.out.setSelectionRange(0, 999999);
     document.execCommand("copy");
-}
-
-function sampleGrammar() {
-    gui.txtVars.value = "S,T,F";
-    gui.txtGrammar.value = "S=>aT|bF #Production rules, it's possible to separate the two sides with -, ->, = or =>\n";
-    gui.txtGrammar.value += "T=bF|b #New lines are also allowed (only in grammars)\nF-aT|a";
-    grammarChange();
-}
-
-function sampleAutomata() {
-    gui.txtVars.value = "S,T,F,Z";
-    gui.txtGrammar.value = "S #Starting state\nT,F #Accepting states\nS=>aT|bF,T=bF|bZ,F-aT|aZ #Function, separation as for automata, left side must be a state, right side a char and a state";
-    grammarChange();
 }

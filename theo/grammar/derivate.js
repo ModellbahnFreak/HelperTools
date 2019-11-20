@@ -157,58 +157,6 @@ function leftDerivation(lenData) {
 
 }
 
-function containsNonTerminals(word) {
-    if (!grParse.hasOwnProperty("variables")) {
-        return true;
-    }
-    var contains = false;
-    word.split('').forEach(c => {
-        if (grParse.variables.indexOf(c) >= 0) {
-            contains = true;
-            return;
-        }
-    });
-    return contains;
-}
-
-function historiesSame(h1, h2) {
-    if (h1.word != h2.word) {
-        return false;
-    }
-    if (h1.history.length != h2.history.length) {
-        return false;
-    }
-    for (var i = 0; i < h1.history.length; i++) {
-        if (h1.history[i].from != h2.history[i].from || h2.history[i].to != h2.history[i].to) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function findSameWord(h, otherList) {
-    var words = [];
-    if (otherList) {
-        otherList.forEach(p => {
-            if (p != h && p.word == h.word) {
-                if (!historiesSame(p, h)) {
-                    words.push(p);
-                }
-            }
-        });
-    }
-    if (words.length == 0) {
-        wordProcuctions.forEach(p => {
-            if (p != h && p.word == h.word) {
-                if (!historiesSame(p, h)) {
-                    words.push(p);
-                }
-            }
-        });
-    }
-    return words;
-}
-
 function checkWordGrammar() {
     if (producedWords[txtWord.value] != undefined) {
         gui.out.value = "The word was found in the language.";

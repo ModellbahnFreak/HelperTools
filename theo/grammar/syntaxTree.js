@@ -107,63 +107,6 @@ function historyToSyntaxTree(history) {
     return synTree;
 }
 
-/*
-\begin{tikzpicture}[level/.style ={sibling distance=30mm/#1}]
-			\node[] (0) {S} child {
-                node [] (1) {T} child {
-                    node [] (4) {T} child {
-                        node [] (10) {F} child {
-                            node [] (11) {x}
-                        }
-                    }
-                } child {
-                    node [] (3) {+}
-                } child {
-                    node [] (2) {T} child {
-                        node [] (5) {T} child {
-                            node [] (8) {F} child {
-                                node [] (9) {x}
-                            }
-                        }
-                    } child {
-                        node [] (6) {+}
-                    } child {
-                        node [] (7) {T} child {
-                            node [] (12) {F} child {node [] (13) {x}
-                        }
-                    }
-                }
-            }
-				};
-            \end{tikzpicture}
-
-{
-    "word": "abc",
-    "history": [
-        {
-            "word": "S",
-            "from": "",
-            "to": "S"
-        },
-        {
-            "word": "aBC",
-            "from": "S",
-            "to": "aBC"
-        },
-        {
-            "word": "abC",
-            "from": "B",
-            "to": "b"
-        },
-        {
-            "word": "abc",
-            "from": "C",
-            "to": "c"
-        }
-    ]
-}
-            */
-
 function displayUnique() {
     if (lastDerivMode == 1) {
         if (grParse.isUnique) {
