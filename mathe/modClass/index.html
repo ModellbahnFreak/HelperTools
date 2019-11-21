@@ -1,0 +1,118 @@
+<!--
+(c) 2019 ModellbahnFreak
+This tool was created by ModellbahnFreak (the author)(https://github.com/ModellbahnFreak) and published via Github
+(https://modellbahnfreak.github.io/HelperTools/theo/grammar/). Usage of the project and/or it's sources (this also
+includes parts of it) without the permission on ModellbahnFreak is not allowed! Furtuermore, the author doesn't take
+any responsibilities for anything (especially not concerning this tool). The result calculated by this tool might be
+inacurate or wrong. The author doesn't claim, that they are correct either. If the results are used, they should be
+checked with care!
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Modulo class table creator</title>
+</head>
+
+<body>
+    m: <input type="number" min="1" value="1" id="txtModul"><br>
+    search: <input type="number" id="numSearch" min="-1" value="-1"><br>
+    <button type="button" onclick="out.innerText='';htmlTable(mult, '*');htmlTable(add, '+');">HTML
+        Table</button><button type="button"
+        onclick="out.innerText='';latexTable(mult, '\\cdot');latexTable(add, '+');">LaTeX
+        Table</button><br>
+    <span id="out"></span>
+    <script>
+        var out = document.getElementById("out");
+        var txtModul = document.getElementById("txtModul");
+        var numSearch = document.getElementById("numSearch");
+        function mult(a, b, m) {
+            return (a * b) % m;
+        }
+        function add(a, b, m) {
+            return (a + b) % m;
+        }
+
+        function htmlTable(f, sign) {
+            var m = parseInt(txtModul.value);
+            var s = parseInt(numSearch.value);
+            var table = "<table><tbody>";
+            for (var a = -1; a < m; a++) {
+                table += "<tr>";
+                for (var b = -1; b < m; b++) {
+                    if (a == -1 || b == -1) {
+                        table += "<th>";
+                        if (a != -1) {
+                            table += "[" + a + "]";
+                        } else if (b != -1) {
+                            table += "[" + b + "]";
+                        } else {
+                            table += "[" + sign + "]";
+                        }
+                        table += "</th>";
+                    } else {
+                        table += "<td>[";
+                        var result = f(a, b, m);
+                        if (result == s) {
+                            table += "<span style='color:red'>";
+                        }
+                        table += result;
+                        if (result == s) {
+                            table += "</span>";
+                        }
+                        table += "]</td>";
+                    }
+                }
+                table += "</tr>";
+            }
+            table += "</tbody></table>";
+            out.innerHTML += table + "<br><br>";
+        }
+
+        function latexTable(f, sign) {
+            var m = parseInt(txtModul.value);
+            var s = parseInt(numSearch.value);
+            var table = "\\begin{table}[!h]\n\\centering\n\\setlength{\\tabcolsep}{3pt}\n\\begin{tabular}{c|";
+            for (var i = 0; i < m; i++) {
+                table += " c";
+            }
+            table += "}\n";
+            for (var a = -1; a < m; a++) {
+                for (var b = -1; b < m; b++) {
+                    if (a == -1 || b == -1) {
+                        if (a != -1) {
+                            table += "$[" + a + "]_{" + m + "}$";
+                        } else if (b != -1) {
+                            table += "$[" + b + "]_{" + m + "}$";
+                        } else {
+                            table += "$[" + sign + "]_{" + m + "}$";
+                        }
+                    } else {
+                        var result = f(a, b, m);
+                        if (result == s) {
+                            table += "$\\textcolor{red}{[" + result + "]_{" + m + "}}$";
+                        } else {
+                            table += "$[" + result + "]_{" + m + "}$";
+                        }
+                    }
+                    if (b < m - 1) {
+                        table += " & ";
+                    }
+                }
+                table += "\\\\";
+                if (a == -1) {
+                    table += " \\hline";
+                }
+                table += "\n";
+            }
+            table += "\\end{tabular}\n\\caption{Rechentabelle zur Restklasse Modulo " + m + "}\n\\label{tab:tabelle}\n\\end{table}";
+            out.innerText += table + "\n\n";
+        }
+    </script>
+</body>
+
+</html>
