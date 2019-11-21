@@ -265,7 +265,7 @@ function nfaToDfa() {
     }
 
     var newStart = [];
-    newStart = newStart.concat(automParse.start);
+    newStart = newStart.concat(automParse.start).sort();
 
     var newStates = pot(automParse.states);
 
@@ -287,6 +287,7 @@ function nfaToDfa() {
                             }
                         }
                     });
+                    toState.sort();
                     var stateStr = arrToString(state);
                     var toStateStr = arrToString(toState);
                     if (!newFunction.hasOwnProperty(stateStr)) {
