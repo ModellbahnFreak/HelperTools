@@ -1,0 +1,118 @@
+<!--(c) 2019 ModellbahnFreak
+This tool was created by ModellbahnFreak (the author)(https://github.com/ModellbahnFreak) and published via Github
+(https://modellbahnfreak.github.io/HelperTools/theo/grammar/). Usage of the project and/or it's sources (this also
+includes parts of it) without the permission on ModellbahnFreak is not allowed! Furtuermore, the author doesn't take
+any responsibilities for anything (especially not concerning this tool). The result calculated by this tool might be
+inacurate or wrong. The author doesn't claim, that they are correct either. If the results are used, they should be
+checked with care!-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Polynom division to LaTeX</title>
+    <link rel="prefetch"
+        href="https://script.google.com/macros/s/AKfycbxbdpTFYejoEwOvt3KpTRZL0ZatpLZUaPHiWqkwawvnKzCzPl0/exec">
+    <style>
+        .line {
+            width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <button type="button" onclick="toLatex();">Convert</button><button type="button" onclick="addLine()">Add new
+        line</button><button type="button" onclick="remLine()">Remove lowest line</button><br>
+    <br>
+    Polynom:<br>
+    <span id="inputArea">
+        <span id="lineContainer0">
+            <input type="text" id="line0" class="line" value="x^3+2x^2-2x-4 = ()\cdot ()+()"><br>
+            -(<input type="text" id="line1" class="line" value="x^3+x^2+2x">)
+        </span>
+        <span id="lineContainer2">
+            <hr id="hr2" align="left" width="500px">
+            <input type="text" id="line2" class="line" value="+x^2-4x-4"><br>
+            -(<input type="text" id="line3" class="line" value="+x^2-4x-4">)
+        </span>
+    </span>
+    <br><br>
+    Result:<br>
+    <span id="out"></span>
+    <script>
+        var lines = document.getElementsByClassName("line");
+        var out = document.getElementById("out");
+        var inputArea = document.getElementById("inputArea");
+        function toLatex() {
+            var tex = "\\setlength{\\arraycolsep}{0pt}\n$\\begin{array}{";
+            var regex = /[^\(&][\+-]/g
+            var line1Val = lines[0].value;
+            var line1Str = line1Val.split("=")[0];
+            var pos = line1Str.search(regex);
+            while (pos >= 0) {
+                line1Str = line1Str.substr(0, pos + 1) + "&" + line1Str.substr(pos + 1, line1Str.length);
+                pos = line1Str.search(regex);
+            }
+            var numCol = line1Str.split("&").length;
+            for (var i = 0; i < numCol + 2; i++) {
+                tex += "l";
+            }
+            tex += "}\n";
+            tex += "&" + line1Str + "&" + line1Val.substr(line1Val.indexOf("=")) + "\\\\ \n";
+            var prefix = "&";
+            var col = 2;
+            for (var i = 1; i < lines.length; i++) {
+                var lineStr = lines[i].value;
+                var linePos = lineStr.search(regex);
+                var colWidth = 0;
+                while (linePos >= 0) {
+                    colWidth++;
+                    lineStr = lineStr.substr(0, linePos + 1) + "&" + lineStr.substr(linePos + 1, lineStr.length);
+                    linePos = lineStr.search(regex);
+                }
+                if (i % 2 == 1) {
+                    tex += prefix.substr(0, prefix.length - 1) + "\\multicolumn{1}{r}{-(}&" + lineStr + ")&\\\\ \\cline{" + col + "-" + (col + colWidth) + "} \n";
+                    prefix += "&";
+                    col++;
+                } else {
+                    tex += prefix + lineStr + "&\\\\ \n";
+                }
+            }
+            tex += "\\end{array}$\n\\normalsize";
+            out.innerText = tex;
+        }
+
+        function addLine() {
+            var lineContainer = document.createElement("span");
+            lineContainer.id = "lineContainer" + lines.length;
+            var separator = document.createElement("hr");
+            separator.width = "500px";
+            separator.align = "left";
+            separator.id = "hr" + lines.length;
+            lineContainer.appendChild(separator);
+            var topLine = document.createElement("input");
+            topLine.type = "text";
+            topLine.id = "line" + lines.length;
+            topLine.className = "line";
+            lineContainer.appendChild(topLine);
+            lineContainer.appendChild(document.createElement("br"));
+            lineContainer.append("-(");
+            var bottomLine = document.createElement("input");
+            bottomLine.type = "text";
+            bottomLine.id = "line" + lines.length;
+            bottomLine.className = "line";
+            lineContainer.appendChild(bottomLine);
+            lineContainer.append(")");
+            inputArea.appendChild(lineContainer);
+        }
+
+        function remLine() {
+            document.getElementById("lineContainer" + (lines.length - 2)).remove();
+        }
+    </script>
+</body>
+
+</html>
