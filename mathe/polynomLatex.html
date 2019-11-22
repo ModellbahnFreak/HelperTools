@@ -24,8 +24,12 @@ checked with care!-->
 </head>
 
 <body>
-    <button type="button" onclick="toLatex();">Convert</button><button type="button" onclick="addLine()">Add new
-        line</button><button type="button" onclick="remLine()">Remove lowest line</button><br>
+    <button type="button" onclick="toLatex();">Convert</button>
+    <button type="button" onclick="addLine()">Add new
+        line</button>
+    <button type="button" onclick="remLine()">Remove lowest line</button>
+    <button type="button" onclick="exportPolynom()">Export</button>
+    <button type="button" onclick="importPolynom()">Import</button><br>
     <br>
     Polynom:<br>
     <span id="inputArea">
@@ -73,12 +77,14 @@ checked with care!-->
                     lineStr = lineStr.substr(0, linePos + 1) + "&" + lineStr.substr(linePos + 1, lineStr.length);
                     linePos = lineStr.search(regex);
                 }
-                if (i % 2 == 1) {
-                    tex += prefix.substr(0, prefix.length - 1) + "\\multicolumn{1}{r}{-(}&" + lineStr + ")&\\\\ \\cline{" + col + "-" + (col + colWidth) + "} \n";
-                    prefix += "&";
-                    col++;
-                } else {
-                    tex += prefix + lineStr + "&\\\\ \n";
+                if (i < lines.length - 1 || lineStr.length > 0) {
+                    if (i % 2 == 1) {
+                        tex += prefix.substr(0, prefix.length - 1) + "\\multicolumn{1}{r}{-(}&" + lineStr + ")&\\\\ \\cline{" + col + "-" + (col + colWidth) + "} \n";
+                        prefix += "&";
+                        col++;
+                    } else {
+                        tex += prefix + lineStr + "&\\\\ \n";
+                    }
                 }
             }
             tex += "\\end{array}$\n\\normalsize";
@@ -86,23 +92,24 @@ checked with care!-->
         }
 
         function addLine() {
+            var oldLineLen = lines.length;
             var lineContainer = document.createElement("span");
-            lineContainer.id = "lineContainer" + lines.length;
+            lineContainer.id = "lineContainer" + oldLineLen;
             var separator = document.createElement("hr");
             separator.width = "500px";
             separator.align = "left";
-            separator.id = "hr" + lines.length;
+            separator.id = "hr" + oldLineLen;
             lineContainer.appendChild(separator);
             var topLine = document.createElement("input");
             topLine.type = "text";
-            topLine.id = "line" + lines.length;
+            topLine.id = "line" + oldLineLen;
             topLine.className = "line";
             lineContainer.appendChild(topLine);
             lineContainer.appendChild(document.createElement("br"));
             lineContainer.append("-(");
             var bottomLine = document.createElement("input");
             bottomLine.type = "text";
-            bottomLine.id = "line" + lines.length;
+            bottomLine.id = "line" + (oldLineLen + 1);
             bottomLine.className = "line";
             lineContainer.appendChild(bottomLine);
             lineContainer.append(")");
@@ -111,6 +118,30 @@ checked with care!-->
 
         function remLine() {
             document.getElementById("lineContainer" + (lines.length - 2)).remove();
+        }
+
+        function exportPolynom() {
+            var values = [];
+            for (var i = 0; i < lines.length; i++) {
+                values.push(lines["line" + i].value);
+            }
+            var valStr = JSON.stringify(values);
+            out.innerText = valStr;
+            console.log(valStr);
+        }
+
+        function importPolynom() {
+            var str = lines[0].value;
+            var values = JSON.parse(str);
+            while (lines.length < values.length) {
+                addLine();
+            }
+            while (lines.length > values.length + 2) {
+                remLine();
+            }
+            for (var i = 0; i < values.length; i++) {
+                lines["line" + i].value = values[i];
+            }
         }
     </script>
 </body>
