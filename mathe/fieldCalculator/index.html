@@ -1,0 +1,95 @@
+<!--(c) 2019 ModellbahnFreak
+This tool was created by ModellbahnFreak (the author)(https://github.com/ModellbahnFreak) (except for the explicitly marked areas) and published via Github
+(https://modellbahnfreak.github.io/HelperTools/theo/grammar/). Usage of the project and/or it's sources (this also
+includes parts of it) without the permission on ModellbahnFreak is not allowed! Furtuermore, the author doesn't take
+any responsibilities for anything (especially not concerning this tool). The result calculated by this tool might be
+inacurate or wrong. The author doesn't claim, that they are correct either. If the results are used, they should be
+checked with care!-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Field calculator</title>
+    <script src="realNumbers.js"></script>
+    <script src="rationalNumbers.js"></script>
+    <script src="f_9.js"></script>
+    <script src="matrix.js"></script>
+    <script src="calculate.js"></script>
+    <style>
+        /*BEGIN: Styleseet for Matrices. From https://stackoverflow.com/questions/11561137/html-css-for-brackets-around-mathematical-matrix-prefer-lightweight*/
+        .matrix {
+            position: relative;
+        }
+
+        .matrix:before,
+        .matrix:after {
+            content: "";
+            position: absolute;
+            top: 0;
+            border: 1px solid #000;
+            width: 6px;
+            height: 100%;
+        }
+
+        .matrix:before {
+            left: -6px;
+            border-right: 0;
+        }
+
+        .matrix:after {
+            right: -6px;
+            border-left: 0;
+        }
+
+        /*END: Styleseet for Matrices*/
+
+        .borderRight {
+            border-right: #000 1px solid;
+        }
+    </style>
+</head>
+
+<body>
+    Field:
+    <select id="selField">
+        <option value="realNumbers">Real numbers</option>
+        <option value="rationalNumbers">Rational numbers</option>
+        <option value="mod">Modulo Fields</option>
+        <option value="f_4">F_4</option>
+        <option value="f_8">F_8</option>
+        <option value="f_9">F_9</option>
+    </select>
+    <select id="selMode">
+        <option value="latex">Latex output</option>
+        <option value="html">Html Output</option>
+    </select><br><br>
+    Single Numbers:
+    <input type="text" id="num1">
+    <input type="text" id="num2">
+    <button type="button" id="addNum">Add</button>
+    <button type="button" id="subtrNum">Subtr</button>
+    <button type="button" id="multNum">Mult</button>
+    <button type="button" id="devideNum">Devide</button>
+    <br><br>
+    Matrix 1:<br>
+    <textarea id="mat1" style="width: 300px; height: 100px;"></textarea><br>
+    Matrix 2:<br>
+    <textarea id="mat2" style="width: 300px; height: 100px;"></textarea><br>
+    <button type="button" id="btnMatAdd">Add</button>
+    <button type="button" id="btnMatSubtr">Subtract</button>
+    <button type="button" id="btnMatMultiply">Multiply</button>
+    <button type="button" id="btnMatDevide">Devide</button>
+    <button type="button" id="btnMatInvert1">Invert Mat 1</button>
+    <button type="button" id="btnAppend">Concat</button>
+    <button type="button" id="btnStepForm">Step form</button>
+    <br><br>
+    <span id="out"></span>
+
+    <script>init();</script>
+
+</body>
+
+</html>
