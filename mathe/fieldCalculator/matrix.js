@@ -156,6 +156,9 @@ Matrix.prototype.toStepForm = function () {
             var row = unusedRows.pop();
             newMat = newMat.clearColumn(i, row);
         }
+        if (SHOW_STEP_FORM_CALCULATION_PATH) {
+            gui.out.innerHTML += newMat.toString() + "<br><br>";
+        }
     }
     return newMat;
 }
