@@ -9,7 +9,7 @@ checked with care!*/
 function F9(str, val1) {
     if (isFinite(str) && isFinite(val1)) {
         this.value0 = parseInt(str);
-        this.value1 = parseInt(str);
+        this.value1 = parseInt(val1);
     } else if (str instanceof F9) {
         this.value0 = str.value0;
         this.value1 = str.value1;
@@ -67,8 +67,8 @@ F9.prototype.normalize = function () {
 F9.prototype.add = function (other) {
     this.normalize();
     other.normalize();
-    newValue0 = this.value0 + other.value0;
-    newValue1 = this.value1 + other.value1;
+    var newValue0 = this.value0 + other.value0;
+    var newValue1 = this.value1 + other.value1;
     var newF9 = new F9(newValue0, newValue1);
     newF9.normalize();
     return newF9;
@@ -83,8 +83,8 @@ F9.prototype.subtract = function (other) {
 F9.prototype.multiply = function (other) {
     this.normalize();
     other.normalize();
-    newValue0 = this.value0 * other.value0 - this.value1 * other.value1;
-    newValue1 = this.value0 * other.value1 + this.value1 * other.value0;
+    var newValue0 = this.value0 * other.value0 - this.value1 * other.value1;
+    var newValue1 = this.value0 * other.value1 + this.value1 * other.value0;
     var newF9 = new F9(newValue0, newValue1);
     newF9.normalize();
     return newF9;
@@ -128,15 +128,15 @@ F9.prototype.invertMult = function () {
 
 F9.prototype.invertAdd = function () {
     this.normalize();
-    newValue0 *= -1;
-    newValue1 *= -1;
+    var newValue0 = -1 * this.value0;
+    var newValue1 = -1 * this.value1;
     var newF9 = new F9(newValue0, newValue1);
     newF9.normalize();
     return newF9;
 }
 
 F9.prototype.equals = function (other) {
-    if (!other instanceof RealNumber) {
+    if (!other instanceof F9) {
         return false;
     }
     return (other.value0 == this.value0 && other.value1 == this.value1);
