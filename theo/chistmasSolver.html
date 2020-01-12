@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Christmas task solver</title>
+</head>
+<body>
+    <button type="button" onclick="calc1();">Calc1</button>
+    <span id="out">
+
+    </span>
+    <script>
+        var out = document.getElementById("out");
+
+        function calc1() {
+            var start = {word: "1234567", history: ""};
+            var process = [start];
+            var processNext = [];
+            var visited = [];
+            while (process.length > 0) {
+                process.forEach(e => {
+                    var withG = {word: derivateG(e.word), history: e.history+"g"};
+                    var withR = {word: derivateR(e.word), history: e.history+"r"};
+                    if (withG.word.length == 1) {
+                        console.log(withG.word + " -- " + withG.history);
+                    } else if (withR.word.length == 1) {
+                        console.log(withR.word + " -- " + withR.history);
+                    } else {
+                        if (visited.indexOf(withG.word) < 0) {
+                            visited.push(withG.word);
+                            processNext.push(withG)
+                        }
+                        if (visited.indexOf(withR.word) < 0) {
+                            visited.push(withR.word);
+                            processNext.push(withR);
+                        }
+                    }
+                });
+                process = processNext;
+                processNext = [];
+            }
+            console.log(visited);
+        }
+
+        function derivateG(w) {
+            var erg = "";
+            for (var i = 0; i < w.length; i++) {
+                if (w.charAt(i) == "1") {
+                    erg += "2";
+                } else if (w.charAt(i) == "2") {
+                    erg += "3";
+                } else if (w.charAt(i) == "3") {
+                    erg += "4";
+                } else if (w.charAt(i) == "4") {
+                    erg += "5";
+                } else if (w.charAt(i) == "5") {
+                    erg += "6";
+                } else if (w.charAt(i) == "6") {
+                    erg += "7";
+                } else if (w.charAt(i) == "7") {
+                    erg += "1";
+                }
+            }
+            erg = erg.split('').sort().filter(
+                function(item, pos, self) {
+                    return self.indexOf(item) == pos;
+                }
+            ).join('');
+            return erg;
+        }
+
+        function derivateR(w) {
+            var erg = "";
+            for (var i = 0; i < w.length; i++) {
+                if (w.charAt(i) == "7") {
+                    erg += "1";
+                } else {
+                    erg += w.charAt(i);
+                }
+            }
+            erg = erg.split('').sort().filter(
+                function(item, pos, self) {
+                    return self.indexOf(item) == pos;
+                }
+            ).join('');
+            return erg;
+        }
+    </script>
+</body>
+</html>
