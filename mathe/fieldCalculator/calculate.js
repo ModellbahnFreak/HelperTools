@@ -6,11 +6,15 @@ any responsibilities for anything (especially not concerning this tool). The res
 inacurate or wrong. The author doesn't claim, that they are correct either. If the results are used, they should be
 checked with care!*/
 
+var SHOW_STEP_FORM_CALCULATION_PATH = false;
+
 var gui = {};
 var fields = {
     "realNumbers": RealNumber,
     "rationalNumbers": RationalNumber,
-    "f_9": F9
+    "f_9": F9,
+    "complexNumbers": ComplexNumber,
+    "mod": ModuloNumber
 };
 var CurrentField = fields["realNumbers"];
 function init() {
@@ -35,11 +39,16 @@ function init() {
 }
 
 function setNewField() {
-    gui.mat1.value = "";
+    /*gui.mat1.value = "";
     gui.mat2.value = "";
     gui.num1.value = "";
-    gui.num2.value = "";
+    gui.num2.value = "";*/
     CurrentField = fields[gui.selField.value];
+    if (CurrentField == ModuloNumber) {
+        gui.modVal.style.display = "initial";
+    } else {
+        gui.modVal.style.display = "none";
+    }
 }
 
 function numberOperation(e) {
@@ -88,7 +97,9 @@ function matOperation(e) {
             if (part2.height == part1.height) {
                 erg = part1.appendRight(part2);
             }
-            gui.out.innerHTML = erg.toStepForm().toString(gui.selMode.value);
+            gui.out.innerHTML = "";
+            var erg = erg.toStepForm().toString(gui.selMode.value);
+            gui.out.innerHTML += erg;
             break;
     }
 }
