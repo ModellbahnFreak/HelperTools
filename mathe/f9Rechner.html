@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>F9 rechner</title>
+</head>
+
+<body>
+    <table>
+        <tbody id="out" style="border: 1px solid black">
+
+        </tbody>
+    </table>
+
+    <script>
+        var out = document.getElementById("out");
+
+        var line1 = document.createElement("tr");
+        var left1 = document.createElement("th");
+        line1.appendChild(left1);
+        for (var i2 = 0; i2 <= 2; i2++) {
+            for (var x2 = 0; x2 <= 2; x2++) {
+                var left = document.createElement("th");
+                var iLeft = i2, xLeft = x2;
+                if (iLeft == 2) {
+                    iLeft = -1;
+                }
+                if (xLeft == 2) {
+                    xLeft = -1;
+                }
+                if (xLeft < 0) {
+                    if (iLeft < 0) {
+                        left.innerHTML = xLeft + "-&iota;";
+                    } else if (iLeft == 0) {
+                        left.innerHTML = xLeft;
+                    } else {
+                        left.innerHTML = xLeft + "+&iota;";
+                    }
+                } else if (xLeft == 0) {
+                    if (iLeft < 0) {
+                        left.innerHTML = "-&iota;";
+                    } else if (iLeft == 0) {
+                        left.innerHTML = "0";
+                    } else {
+                        left.innerHTML = "&iota;";
+                    }
+                } else {
+                    if (iLeft < 0) {
+                        left.innerHTML = xLeft + " - &iota;";
+                    } else if (iLeft == 0) {
+                        left.innerHTML = xLeft;
+                    } else {
+                        left.innerHTML = xLeft + " + &iota;";
+                    }
+                }
+                line1.appendChild(left);
+            }
+        }
+        out.appendChild(line1);
+        for (var i1 = 0; i1 <= 2; i1++) {
+            for (var x1 = 0; x1 <= 2; x1++) {
+                var line = document.createElement("tr");
+                var left = document.createElement("th");
+                var iLeft = i1, xLeft = x1;
+                if (iLeft == 2) {
+                    iLeft = -1;
+                }
+                if (xLeft == 2) {
+                    xLeft = -1;
+                }
+                if (xLeft < 0) {
+                    if (iLeft < 0) {
+                        left.innerHTML = xLeft + "-&iota;";
+                    } else if (iLeft == 0) {
+                        left.innerHTML = xLeft;
+                    } else {
+                        left.innerHTML = xLeft + "+&iota;";
+                    }
+                } else if (xLeft == 0) {
+                    if (iLeft < 0) {
+                        left.innerHTML = "-&iota;";
+                    } else if (iLeft == 0) {
+                        left.innerHTML = "0";
+                    } else {
+                        left.innerHTML = "&iota;";
+                    }
+                } else {
+                    if (iLeft < 0) {
+                        left.innerHTML = xLeft + " - &iota;";
+                    } else if (iLeft == 0) {
+                        left.innerHTML = xLeft;
+                    } else {
+                        left.innerHTML = xLeft + " + &iota;";
+                    }
+                }
+                line.appendChild(left);
+                for (var i2 = 0; i2 <= 2; i2++) {
+                    for (var x2 = 0; x2 <= 2; x2++) {
+                        var cell = document.createElement("td");
+                        var ergI = (i1*x2+x1*i2) % 3;
+                        var ergX = (x1*x2-i1*i2) % 3;
+                        while(ergI < 0) {
+                            ergI += 3;   
+                        }
+                        while(ergX < 0) {
+                            ergX += 3;   
+                        }
+                        if (ergI == 2) {
+                            ergI = -1;
+                        }
+                        if (ergX == 2) {
+                            ergX = -1;
+                        }
+                        if (ergX < 0) {
+                            if (ergI < 0) {
+                                cell.innerHTML = ergX + "-&iota;";
+                            } else if (ergI == 0) {
+                                cell.innerHTML = ergX;
+                            } else {
+                                cell.innerHTML = ergX + "+&iota;";
+                            }
+                        } else if (ergX == 0) {
+                            if (ergI < 0) {
+                                cell.innerHTML = "-&iota;";
+                            } else if (ergI == 0) {
+                                cell.innerHTML = "0";
+                            } else {
+                                cell.innerHTML = "&iota;";
+                            }
+                        } else {
+                            if (ergI < 0) {
+                                cell.innerHTML = ergX + " -&iota;";
+                            } else if (ergI == 0) {
+                                cell.innerHTML = ergX;
+                            } else {
+                                cell.innerHTML = ergX + " +&iota;";
+                            }
+                        }
+                        cell.style.border = "1px solid black";
+                        line.appendChild(cell);
+                    }
+                }
+                out.appendChild(line);
+            }
+        }
+    </script>
+</body>
+
+</html>
