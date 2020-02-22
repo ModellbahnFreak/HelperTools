@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Regex builder</title>
+</head>
+
+<body>
+
+    <button onclick="calc();">Calc</button><br>
+    <textarea id="out" style="width: 200px; height: 100px;"></textarea>
+
+    <script>
+        function step(z, x) {
+            if (x == "a") {
+                return (z % 4) + 1;
+            } else if (x == "b") {
+                var erg = ((z - 2) % 4) + 1;
+                while (erg < 1) {
+                    erg += 4;
+                }
+                return erg;
+            } else if (x == "") {
+                return z;
+            } else {
+                return -1;
+            }
+        }
+        function allWords(length) {
+            if (length <= 0) {
+                return [""];
+            }
+            var erg = [];
+            var allWordsShorter = allWords(length - 1);
+            allWordsShorter.forEach(w => {
+                erg.push(w + "a");
+                erg.push(w + "b");
+            });
+            return erg;
+        }
+
+        function calc() {
+            var r = [];
+            var n = 4;
+            var k = 0;
+            r[k] = [];
+            for (var i = 1; i <= n; i++) {
+                r[k][i] = [];
+                for (var j = 1; j <= n; j++) {
+                    r[k][i][j] = "(";
+                    for (var len = 0; len <= 4; len++) {
+                        var words = allWords(len);
+                        words.forEach(w => {
+                            var z = i;
+                            var graterK = false;
+                            for (var a = 0; a < w.length; a++) {
+                                z = step(z, w.charAt(a));
+                                if (a < w.length - 1 && z > k) {
+                                    graterK = true;
+                                }
+                            }
+                            if (!graterK && z == j) {
+                                r[k][i][j] += w + "|";
+                            }
+                        });
+                    }
+                    if (r[k][i][j] == "(|") {
+                        r[k][i][j] = "";
+                    } else if (r[k][i][j] == "(") {
+                        r[k][i][j] = null;
+                    } else {
+                        r[k][i][j] = r[k][i][j].substr(0, r[k][i][j].length - 1) + ")";
+                    }
+                }
+            }
+            for (k = 1; k <= n; k++) {
+                r[k] = [];
+                for (var i = 1; i <= n; i++) {
+                    r[k][i] = [];
+                    for (var j = 1; j <= n; j++) {
+                        if (r[k - 1][i][j] == null) {
+                            if (r[k - 1][i][k] == null || r[k - 1][k][k] == null || r[k - 1][k][j] == null) {
+                                r[k][i][j] = null;
+                            } else {
+                                if (r[k - 1][i][k] == "" && r[k - 1][k][k] == "" && r[k - 1][k][j] == "") {
+                                    r[k - 1][i][k] = "";
+                                } else {
+                                    if (r[k - 1][k][k] == "") {
+                                        r[k][i][j] = "(" + r[k - 1][i][k] + r[k - 1][k][j] + ")";
+                                    } else {
+                                        r[k][i][j] = "(" + r[k - 1][i][k] + "(" + r[k - 1][k][k] + ")*" + r[k - 1][k][j] + ")";
+                                    }
+                                }
+                            }
+                        } else {
+                            if (r[k - 1][i][k] == null || r[k - 1][k][k] == null || r[k - 1][k][j] == null) {
+                                r[k][i][j] = r[k - 1][i][j];
+                            } else {
+                                if (r[k - 1][i][k] == "" && r[k - 1][k][k] == "" && r[k - 1][k][j] == "") {
+                                    r[k][i][j] = r[k - 1][i][j];
+                                } else {
+                                    if (r[k - 1][k][k] == "") {
+                                        r[k][i][j] = "(" + r[k - 1][i][j] + "|" + r[k - 1][i][k] + r[k - 1][k][j] + ")";
+                                    } else {
+                                        r[k][i][j] = "(" + r[k - 1][i][j] + "|" + r[k - 1][i][k] + "(" + r[k - 1][k][k] + ")*" + r[k - 1][k][j] + ")";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            console.log(r);
+            document.getElementById("out").value = r[4][1][1];
+            console.log(r[4][1][1]);
+        }
+    </script>
+</body>
+
+</html>
