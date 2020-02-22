@@ -32,8 +32,6 @@ function init() {
     setEnableToAutomata(false);
     setEnabledRegex(false);
 
-    sampleGrammar();
-
     gui.txtGrammar.addEventListener("change", grammarChange);
     gui.txtVars.addEventListener("change", grammarChange);
     gui.btnParse.addEventListener("click", parse);
@@ -64,6 +62,10 @@ function init() {
     gui.btnCheckRegex.addEventListener("click", checkRegex);
     gui.btnRegexToAutomata.addEventListener("click", regexToAutomata);
     gui.btnRegexCreate.addEventListener("click", regexCreateWords);
+    gui.btnRegEx.addEventListener("click", automataToRegex);
+
+    window.onbeforeunload = saveFieldData;
+    loadFieldData();
 }
 
 function setEnableParser(on) {
@@ -106,6 +108,7 @@ function setEnableAutomata(on) {
         gui.btnStringAutom.disabled = "";
         gui.btnNfaDfa.disabled = "";
         gui.btnProductautomata.disabled = "";
+        gui.btnRegEx.disabled = "";
     } else {
         gui.btnDraw.disabled = "disabled";
         gui.btnLatex.disabled = "disabled";
@@ -113,6 +116,7 @@ function setEnableAutomata(on) {
         gui.btnStringAutom.disabled = "disabled";
         gui.btnNfaDfa.disabled = "disabled";
         gui.btnProductautomata.disabled = "disabled";
+        gui.btnRegEx.disabled = "disabled";
     }
 }
 
@@ -172,4 +176,17 @@ function copyOutToClipboard() {
     gui.out.select();
     gui.out.setSelectionRange(0, 999999);
     document.execCommand("copy");
+}
+
+function saveFieldData(e) {
+    localStorage.setItem("txtVars", gui.txtVars.value);
+    localStorage.setItem("txtGrammar", gui.txtGrammar.value);
+}
+
+function loadFieldData() {
+    gui.txtVars.value = localStorage.getItem("txtVars");
+    gui.txtGrammar.value = localStorage.getItem("txtGrammar");
+    if (gui.txtVars.value == "" && gui.txtGrammar.value == "") {
+        sampleGrammar();
+    }
 }
