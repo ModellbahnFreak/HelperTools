@@ -5,10 +5,72 @@ const cellWidth = allCells[0].offsetWidth;
 var cellsByTrack = [];
 var trackContent = [];
 var currOffset = 0;
+var currentMachine = undefined;
+
+const btnParseMachine = document.querySelector("#btnParseMachine");
+const btnConvert = document.querySelector("#btnConvert");
+const btnStep = document.querySelector("#btnStep");
+const btnRun = document.querySelector("#btnRun");
+const btnStop = document.querySelector("#btnStop");
+const machineProgramInput = document.querySelector("#machineProgramInput");
+const txtInputWord = document.querySelector("#txtInputWord");
+const btnWriteToTrack = document.querySelector("#btnWriteToTrack");
 
 function init() {
     tracks.style.transform = "translateX(50%) translateX(-" + (cellWidth / 2) + "px)";
     reinitTrackContent();
+    btnParseMachine.addEventListener("click", () => {
+        try {
+            currentMachine = execNormalProgram(0, machineProgramInput.value);
+        } catch (e) {
+            lblCurrentState.value = "ERROR: " + e;
+        }
+    });
+    btnRun.addEventListener("click", () => {
+        if (currentMachine) {
+            currentMachine.exec();
+        } else {
+            alert("You have to enter and parse a machine first");
+        }
+    });
+    btnStop.addEventListener("click", () => {
+        if (currentMachine) {
+            currentMachine.shouldStop = true;
+        } else {
+            alert("You have to enter and parse a machine first");
+        }
+    });
+    btnStep.addEventListener("click", () => {
+        if (currentMachine) {
+            currentMachine.exec(1);
+        } else {
+            alert("You have to enter and parse a machine first");
+        }
+    });
+    btnConvert.addEventListener("click", () => {
+        if (currentMachine) {
+            currentMachine = convertMachineToIneffective(currentMachine);
+        } else {
+            alert("You have to enter and parse a machine first");
+        }
+    });
+    btnWriteToTrack.addEventListener("click", () => {
+        writeToTrack(0, txtInputWord.value);
+    });
+    machineProgramInput.addEventListener("change", () => {
+        localStorage.setItem("machineProgram", machineProgramInput.value);
+    });
+    txtInputWord.addEventListener("change", () => {
+        localStorage.setItem("inputWord", txtInputWord.value);
+    });
+    machineProgramInput.value = localStorage.getItem("machineProgram");
+    txtInputWord.value = localStorage.getItem("inputWord");
+    try {
+        currentMachine = execNormalProgram(0, machineProgramInput.value);
+    } catch (e) {
+        lblCurrentState.value = "ERROR: " + e;
+    }
+    writeToTrack(0, localStorage.getItem("inputWord"));
 }
 
 function reinitTrackContent() {
@@ -125,18 +187,25 @@ function stepTuringNormal(program, steps) {
             }
         }
         program.currState = program.fun[program.currState][currChr].newState;
+        lblCurrentState.value = program.currState;
         if (program.endStates.includes(program.currState)) {
             program.hasEnded = true;
             program.wasSuccessFull = true;
+            lblCurrentState.value = program.currState + " - accepted";
         }
     } else {
         program.hasEnded = true;
         program.wasSuccessFull = false;
+        lblCurrentState.value = program.currState + " - rejected";
     }
-    if ((numSteps - 1) != 0 && !program.hasEnded) {
-        setTimeout(() => {
-            stepTuringNormal(program, numSteps - 1);
-        }, 1000);
+    if (program.shouldStop) {
+        program.shouldStop = false;
+    } else {
+        if ((numSteps - 1) != 0 && !program.hasEnded) {
+            setTimeout(() => {
+                stepTuringNormal(program, numSteps - 1);
+            }, 1000);
+        }
     }
     return program.hasEnded;
 }
@@ -177,18 +246,25 @@ function stepTuringDual(program, steps) {
             }
         }
         program.currState = program.fun[program.currState][currChrsStr].newState;
+        lblCurrentState.value = program.currState;
         if (program.endStates.includes(program.currState)) {
             program.hasEnded = true;
             program.wasSuccessFull = true;
+            lblCurrentState.value = program.currState + " - accepted";
         }
     } else {
         program.hasEnded = true;
         program.wasSuccessFull = false;
+        lblCurrentState.value = program.currState + " - rejected";
     }
-    if ((numSteps - 1) != 0 && !program.hasEnded) {
-        setTimeout(() => {
-            stepTuringDual(program, numSteps - 1);
-        }, 1000);
+    if (program.shouldStop) {
+        program.shouldStop = false;
+    } else {
+        if ((numSteps - 1) != 0 && !program.hasEnded) {
+            setTimeout(() => {
+                stepTuringDual(program, numSteps - 1);
+            }, 1000);
+        }
     }
     return program.hasEnded;
 }
@@ -210,7 +286,11 @@ function convertMachineToIneffective(program) {
         hasEnded: false,
         wasSuccessFull: false,
         alphabet: [],
-        exec: (steps) => { return stepTuringDual(newProgram, steps) }
+        shouldStop: false,
+        exec: (steps) => {
+            program.shouldStop = false;
+            return stepTuringDual(newProgram, steps);
+        }
     };
     program.alphabet.forEach(char => {
         newProgram.fun["s"][char] = {
@@ -294,6 +374,7 @@ function convertMachineToIneffective(program) {
             };
         }
     });
+    lblCurrentState.value = newProgram.currState + " - not running yet";
     return newProgram;
 }
 
@@ -309,7 +390,11 @@ function execNormalProgram(trackNum, programText) {
         wasSuccessFull: false,
         alphabet: [],
         states: ["s", "f"],
-        exec: (steps) => { return stepTuringNormal(program, steps) }
+        shouldStop: false,
+        exec: (steps) => {
+            program.shouldStop = false;
+            return stepTuringNormal(program, steps);
+        }
     };
     operations.forEach(line => {
         var parts = line.split(",");
@@ -331,6 +416,7 @@ function execNormalProgram(trackNum, programText) {
             program.states.push(parts[2]);
         }
     });
+    lblCurrentState.value = program.currState + " - not running yet";
 
     return program;
 }

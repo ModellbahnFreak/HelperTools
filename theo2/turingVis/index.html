@@ -8,6 +8,9 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .turingContainer {
             overflow: hidden;
         }
 
@@ -44,6 +47,12 @@
             border: solid transparent 1px;
         }
 
+        .cell,
+        .cell::after,
+        .cell::before {
+            box-sizing: unset;
+        }
+
         .border {
             border: solid black 1px;
         }
@@ -66,61 +75,90 @@
             margin-left: auto;
             margin-right: auto;
         }
+
+        #machineProgramInput {
+            height: 150px;
+        }
+
+        .footer {
+            bottom: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+        }
     </style>
 </head>
 
 <body>
-    <div id="container" class="turingContainer">
-        <div class="pointerTrack">
-            <div class="pointer">
-                <svg class="bi bi-backspace-reverse-fill" width="2em" height="2em" viewBox="0 0 16 16"
-                    fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M0 3a2 2 0 0 1 2-2h7.08a2 2 0 0 1 1.519.698l4.843 5.651a1 1 0 0 1 0 1.302L10.6 14.3a2 2 0 0 1-1.52.7H2a2 2 0 0 1-2-2V3zm9.854 2.854a.5.5 0 0 0-.708-.708L7 7.293 4.854 5.146a.5.5 0 1 0-.708.708L6.293 8l-2.147 2.146a.5.5 0 0 0 .708.708L7 8.707l2.146 2.147a.5.5 0 0 0 .708-.708L7.707 8l2.147-2.146z" />
-                </svg>
+    <main role="main">
+        <div id="container" class="turingContainer">
+            <div class="pointerTrack">
+                <div class="pointer">
+                    <svg class="bi bi-backspace-reverse-fill" width="2em" height="2em" viewBox="0 0 16 16"
+                        fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M0 3a2 2 0 0 1 2-2h7.08a2 2 0 0 1 1.519.698l4.843 5.651a1 1 0 0 1 0 1.302L10.6 14.3a2 2 0 0 1-1.52.7H2a2 2 0 0 1-2-2V3zm9.854 2.854a.5.5 0 0 0-.708-.708L7 7.293 4.854 5.146a.5.5 0 1 0-.708.708L6.293 8l-2.147 2.146a.5.5 0 0 0 .708.708L7 8.707l2.146 2.147a.5.5 0 0 0 .708-.708L7.707 8l2.147-2.146z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="trackContainer">
+                <div id="track1" class="track">
+                    <div class="cell border">1</div>
+                    <div class="cell border">2</div>
+                    <div class="cell border">3</div>
+                    <div class="cell border">4</div>
+                </div>
+                <div id="track2" class="track">
+                    <div class="cell"></div>
+                    <div class="cell border">1</div>
+                    <div class="cell border">2</div>
+                    <div class="cell border">2</div>
+                </div>
             </div>
         </div>
-        <div class="trackContainer">
-            <div id="track1" class="track">
-                <div class="cell border">1</div>
-                <div class="cell border">2</div>
-                <div class="cell border">3</div>
-                <div class="cell border">4</div>
-            </div>
-            <div id="track2" class="track">
-                <div class="cell"></div>
-                <div class="cell border">1</div>
-                <div class="cell border">2</div>
-                <div class="cell border">2</div>
-            </div>
-        </div>
-    </div>
 
-    <div class="container mt-5">
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Current state:</span>
+        <div class="container mt-5">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Current state:</span>
+                </div>
+                <input type="text" class="form-control" placeholder="Current State" id="lblCurrentState" disabled>
             </div>
-            <input type="text" class="form-control" placeholder="Current State" id="lblCurrentState" disabled>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Program:</span>
+                </div>
+                <textarea class="form-control" placeholder="Machine program" id="machineProgramInput"></textarea>
+            </div>
+            <div class="mb-3">
+                <div>
+                    <button type="button" id="btnParseMachine" class="btn btn-success">Parse new code</button>
+                    <button type="button" id="btnConvert" class="btn btn-primary">Convert to 6 states</button>
+                </div>
+                <div class="mt-2">
+                    <button type="button" id="btnStep" class="btn btn-primary">1 step</button>
+                    <button type="button" id="btnRun" class="btn btn-success">Run</button>
+                    <button type="button" id="btnStop" class="btn btn-danger">Stop</button>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Write to tape:</span>
+                </div>
+                <input type="text" class="form-control" placeholder="Input word" id="txtInputWord">
+                <button type="button" class="btn btn-success" id="btnWriteToTrack">Write</button>
+            </div>
         </div>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Program:</span>
-            </div>
-            <textarea class="form-control" placeholder="Machine program" id="machineProgramInput"></textarea>
+    </main>
+
+    <footer class="footer mt-auto py-3">
+        <div class="container">
+            <span class="text-muted">
+                UI Using <a href="https://getbootstrap.com/">Bootstrap</a>.<br>
+                &quot;Arrow&quot; from <a
+                    href="https://icons.getbootstrap.com/icons/backspace-reverse-fill/">https://icons.getbootstrap.com/</a>
+            </span>
         </div>
-        <div class="mb-3">
-            <div>
-                <button type="button" id="btnParseMachine" class="btn btn-success">Parse new code</button>
-                <button type="button" id="btnConvert" class="btn btn-primary">Convert to 6 states</button>
-            </div>
-            <div class="mt-2">
-                <button type="button" id="btnStep" class="btn btn-primary">1 step</button>
-                <button type="button" id="btnRun" class="btn btn-success">Run</button>
-                <button type="button" id="btnStop" class="btn btn-danger">Stop</button>
-            </div>
-        </div>
-    </div>
+    </footer>
 
     <script src="logic.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
