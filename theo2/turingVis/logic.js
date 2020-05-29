@@ -386,6 +386,16 @@ function convertMachineToIneffective(program) {
                 move: "r"
             };
         }
+        newProgram.fun["l_to"][char + ";q0"] = {
+            newState: "l_from",
+            newChr: char + ";q1",
+            move: "r"
+        };
+        newProgram.fun["r_to"][char + ";q0"] = {
+            newState: "r_from",
+            newChr: char + ";q1",
+            move: "l"
+        };
     });
     lblCurrentState.value = newProgram.currState + " - not running yet";
     return newProgram;
