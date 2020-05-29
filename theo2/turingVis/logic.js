@@ -139,11 +139,11 @@ function insertOntoTrack(trackNum, end, char) {
             if (end) {
                 allTracks[a].appendChild(newTop);
                 cellsByTrack[a].splice(cellsByTrack[a].length, 0, newTop);
-                trackContent[trackNum].splice(trackContent[trackNum].length, 0, char);
+                trackContent[a].splice(trackContent[a].length, 0, char);
             } else {
                 allTracks[a].prepend(newTop);
                 cellsByTrack[a].splice(0, 0, newTop);
-                trackContent[trackNum].splice(0, 0, char);
+                trackContent[a].splice(0, 0, char);
             }
             allCells.push(newTop);
         } else {
@@ -153,11 +153,11 @@ function insertOntoTrack(trackNum, end, char) {
             if (end) {
                 allTracks[a].appendChild(newBottom);
                 cellsByTrack[a].splice(cellsByTrack[a].length, 0, newBottom);
-                trackContent[trackNum].splice(trackContent[trackNum].length, 0, "");
+                trackContent[a].splice(trackContent[a].length, 0, "");
             } else {
                 allTracks[a].prepend(newBottom);
                 cellsByTrack[a].splice(0, 0, newBottom);
-                trackContent[trackNum].splice(0, 0, "");
+                trackContent[a].splice(0, 0, "");
             }
             allCells.push(newBottom);
         }
