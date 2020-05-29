@@ -15,6 +15,7 @@ const btnStop = document.querySelector("#btnStop");
 const machineProgramInput = document.querySelector("#machineProgramInput");
 const txtInputWord = document.querySelector("#txtInputWord");
 const btnWriteToTrack = document.querySelector("#btnWriteToTrack");
+const btnReset = document.querySelector("#btnReset");
 
 function init() {
     tracks.style.transform = "translateX(50%) translateX(-" + (cellWidth / 2) + "px)";
@@ -62,6 +63,14 @@ function init() {
     });
     txtInputWord.addEventListener("change", () => {
         localStorage.setItem("inputWord", txtInputWord.value);
+    });
+    btnReset.addEventListener("click", () => {
+        try {
+            currentMachine = execNormalProgram(0, machineProgramInput.value);
+            writeToTrack(0, txtInputWord.value);
+        } catch (e) {
+            lblCurrentState.value = "ERROR: " + e;
+        }
     });
     machineProgramInput.value = localStorage.getItem("machineProgram");
     txtInputWord.value = localStorage.getItem("inputWord");
@@ -161,109 +170,113 @@ function changeCellContent(track, index, newChar) {
 }
 
 function stepTuringNormal(program, steps) {
-    const numSteps = steps > 0 ? steps : -1;
-    if (numSteps == 0) {
-        return program.hasEnded;
-    }
-    const currChr = trackContent[program.track][program.currentCellIndex]
-    if (program.fun[program.currState] && program.fun[program.currState][currChr]) {
-        trackContent[program.track][program.currentCellIndex] = program.fun[program.currState][currChr].newChr;
-        changeCellContent(program.track, program.currentCellIndex, program.fun[program.currState][currChr].newChr);
-        if (program.fun[program.currState][currChr].move == "l") {
-            if (program.currentCellIndex > 0) {
-                program.currentCellIndex--;
-                gotoCell(program.currentCellIndex);
-            } else {
-                insertOntoTrack(program.track, false, "_");
-            }
-        } else if (program.fun[program.currState][currChr].move == "r") {
-            if (program.currentCellIndex < trackContent[program.track].length - 1) {
-                program.currentCellIndex++;
-                gotoCell(program.currentCellIndex);
-            } else {
-                insertOntoTrack(program.track, true, "_");
-                program.currentCellIndex++;
-                gotoCell(program.currentCellIndex);
-            }
+    if (!program.hasEnded) {
+        const numSteps = steps > 0 ? steps : -1;
+        if (numSteps == 0) {
+            return program.hasEnded;
         }
-        program.currState = program.fun[program.currState][currChr].newState;
-        lblCurrentState.value = program.currState;
-        if (program.endStates.includes(program.currState)) {
+        const currChr = trackContent[program.track][program.currentCellIndex]
+        if (program.fun[program.currState] && program.fun[program.currState][currChr]) {
+            trackContent[program.track][program.currentCellIndex] = program.fun[program.currState][currChr].newChr;
+            changeCellContent(program.track, program.currentCellIndex, program.fun[program.currState][currChr].newChr);
+            if (program.fun[program.currState][currChr].move == "l") {
+                if (program.currentCellIndex > 0) {
+                    program.currentCellIndex--;
+                    gotoCell(program.currentCellIndex);
+                } else {
+                    insertOntoTrack(program.track, false, "_");
+                }
+            } else if (program.fun[program.currState][currChr].move == "r") {
+                if (program.currentCellIndex < trackContent[program.track].length - 1) {
+                    program.currentCellIndex++;
+                    gotoCell(program.currentCellIndex);
+                } else {
+                    insertOntoTrack(program.track, true, "_");
+                    program.currentCellIndex++;
+                    gotoCell(program.currentCellIndex);
+                }
+            }
+            program.currState = program.fun[program.currState][currChr].newState;
+            lblCurrentState.value = program.currState;
+            if (program.endStates.includes(program.currState)) {
+                program.hasEnded = true;
+                program.wasSuccessFull = true;
+                lblCurrentState.value = program.currState + " - accepted";
+            }
+        } else {
             program.hasEnded = true;
-            program.wasSuccessFull = true;
-            lblCurrentState.value = program.currState + " - accepted";
+            program.wasSuccessFull = false;
+            lblCurrentState.value = program.currState + " - rejected";
         }
-    } else {
-        program.hasEnded = true;
-        program.wasSuccessFull = false;
-        lblCurrentState.value = program.currState + " - rejected";
-    }
-    if (program.shouldStop) {
-        program.shouldStop = false;
-    } else {
-        if ((numSteps - 1) != 0 && !program.hasEnded) {
-            setTimeout(() => {
-                stepTuringNormal(program, numSteps - 1);
-            }, 1000);
+        if (program.shouldStop) {
+            program.shouldStop = false;
+        } else {
+            if ((numSteps - 1) != 0 && !program.hasEnded) {
+                setTimeout(() => {
+                    stepTuringNormal(program, numSteps - 1);
+                }, 1000);
+            }
         }
     }
     return program.hasEnded;
 }
 
 function stepTuringDual(program, steps) {
-    const numSteps = steps > 0 ? steps : -1;
-    if (numSteps == 0) {
-        return program.hasEnded;
-    }
-    const currChrs = [];
-    for (var i = 0; i < allTracks.length; i++) {
-        if (trackContent[i][program.currentCellIndex] && trackContent[i][program.currentCellIndex].length > 0) {
-            currChrs.push(trackContent[i][program.currentCellIndex]);
+    if (!program.hasEnded) {
+        const numSteps = steps > 0 ? steps : -1;
+        if (numSteps == 0) {
+            return program.hasEnded;
         }
-    }
-    const currChrsStr = currChrs.join(";");
-    if (program.fun[program.currState] && program.fun[program.currState][currChrsStr]) {
-        const newChrs = program.fun[program.currState][currChrsStr].newChr.split(";");
-        for (var i = 0; i < newChrs.length; i++) {
-            trackContent[i][program.currentCellIndex] = newChrs[i];
-            changeCellContent(i, program.currentCellIndex, newChrs[i]);
-        }
-        if (program.fun[program.currState][currChrsStr].move == "l") {
-            if (program.currentCellIndex > 0) {
-                program.currentCellIndex--;
-                gotoCell(program.currentCellIndex);
-            } else {
-                insertOntoTrack(0, false, "_");
-            }
-        } else if (program.fun[program.currState][currChrsStr].move == "r") {
-            if (program.currentCellIndex < trackContent[0].length - 1) {
-                program.currentCellIndex++;
-                gotoCell(program.currentCellIndex);
-            } else {
-                insertOntoTrack(0, true, "_");
-                program.currentCellIndex++;
-                gotoCell(program.currentCellIndex);
+        const currChrs = [];
+        for (var i = 0; i < allTracks.length; i++) {
+            if (trackContent[i][program.currentCellIndex] && trackContent[i][program.currentCellIndex].length > 0) {
+                currChrs.push(trackContent[i][program.currentCellIndex]);
             }
         }
-        program.currState = program.fun[program.currState][currChrsStr].newState;
-        lblCurrentState.value = program.currState;
-        if (program.endStates.includes(program.currState)) {
+        const currChrsStr = currChrs.join(";");
+        if (program.fun[program.currState] && program.fun[program.currState][currChrsStr]) {
+            const newChrs = program.fun[program.currState][currChrsStr].newChr.split(";");
+            for (var i = 0; i < newChrs.length; i++) {
+                trackContent[i][program.currentCellIndex] = newChrs[i];
+                changeCellContent(i, program.currentCellIndex, newChrs[i]);
+            }
+            if (program.fun[program.currState][currChrsStr].move == "l") {
+                if (program.currentCellIndex > 0) {
+                    program.currentCellIndex--;
+                    gotoCell(program.currentCellIndex);
+                } else {
+                    insertOntoTrack(0, false, "_");
+                }
+            } else if (program.fun[program.currState][currChrsStr].move == "r") {
+                if (program.currentCellIndex < trackContent[0].length - 1) {
+                    program.currentCellIndex++;
+                    gotoCell(program.currentCellIndex);
+                } else {
+                    insertOntoTrack(0, true, "_");
+                    program.currentCellIndex++;
+                    gotoCell(program.currentCellIndex);
+                }
+            }
+            program.currState = program.fun[program.currState][currChrsStr].newState;
+            lblCurrentState.value = program.currState;
+            if (program.endStates.includes(program.currState)) {
+                program.hasEnded = true;
+                program.wasSuccessFull = true;
+                lblCurrentState.value = program.currState + " - accepted";
+            }
+        } else {
             program.hasEnded = true;
-            program.wasSuccessFull = true;
-            lblCurrentState.value = program.currState + " - accepted";
+            program.wasSuccessFull = false;
+            lblCurrentState.value = program.currState + " - rejected";
         }
-    } else {
-        program.hasEnded = true;
-        program.wasSuccessFull = false;
-        lblCurrentState.value = program.currState + " - rejected";
-    }
-    if (program.shouldStop) {
-        program.shouldStop = false;
-    } else {
-        if ((numSteps - 1) != 0 && !program.hasEnded) {
-            setTimeout(() => {
-                stepTuringDual(program, numSteps - 1);
-            }, 1000);
+        if (program.shouldStop) {
+            program.shouldStop = false;
+        } else {
+            if ((numSteps - 1) != 0 && !program.hasEnded) {
+                setTimeout(() => {
+                    stepTuringDual(program, numSteps - 1);
+                }, 1000);
+            }
         }
     }
     return program.hasEnded;
@@ -379,25 +392,30 @@ function convertMachineToIneffective(program) {
 }
 
 function execNormalProgram(trackNum, programText) {
-    var operations = programText.split("\n").map(l => l.trim().toLowerCase()).filter(l => !l.startsWith("#") && l.length != 0);
+    var operations = programText.split("\n").map(l => l.trim().toLowerCase()).filter(l => !l.startsWith(";") && l.length != 0);
     var program = {
         fun: {},
         currentCellIndex: 0,
         track: trackNum,
-        endStates: ["f"],
+        endStates: [],
         currState: "s",
         hasEnded: false,
         wasSuccessFull: false,
         alphabet: [],
-        states: ["s", "f"],
+        states: [],
         shouldStop: false,
         exec: (steps) => {
             program.shouldStop = false;
             return stepTuringNormal(program, steps);
         }
     };
-    operations.forEach(line => {
+    var syntaxInvalid = -1;
+    for (var i = 0; i < operations.length; i++) {
+        const line = operations[i];
         var parts = line.split(",");
+        if (parts.length != 5) {
+            syntaxInvalid = i;
+        }
         if (!program.fun[parts[0]]) {
             program.fun[parts[0]] = {};
         }
@@ -414,6 +432,58 @@ function execNormalProgram(trackNum, programText) {
         }
         if (program.states.indexOf(parts[2]) < 0) {
             program.states.push(parts[2]);
+        }
+        if (program.states.indexOf(parts[0]) < 0) {
+            program.states.push(parts[0]);
+        }
+    }
+    if (syntaxInvalid >= 0) {
+        console.log("Fallback to other syntax");
+        program.fun = {};
+        program.states = [];
+        program.alphabet = [];
+        syntaxInvalid = -1;
+        for (var i = 0; i < operations.length; i++) {
+            const line = operations[i];
+            var parts = line.split(" ");
+            if (parts.length != 5) {
+                syntaxInvalid = i;
+            }
+            if (!program.fun[parts[0]]) {
+                program.fun[parts[0]] = {};
+            }
+            program.fun[parts[0]][parts[1]] = {
+                newState: parts[4],
+                newChr: parts[2],
+                move: parts[3]
+            };
+            if (program.alphabet.indexOf(parts[2]) < 0) {
+                program.alphabet.push(parts[2]);
+            }
+            if (program.alphabet.indexOf(parts[1]) < 0) {
+                program.alphabet.push(parts[1]);
+            }
+            if (program.states.indexOf(parts[4]) < 0) {
+                program.states.push(parts[4]);
+            }
+            if (program.states.indexOf(parts[0]) < 0) {
+                program.states.push(parts[0]);
+            }
+        }
+    }
+    if (syntaxInvalid >= 0) {
+        throw new Error("Syntax error in line " + (syntaxInvalid + 1))
+    }
+    if (program.states.indexOf("s") < 0) {
+        if (program.states.indexOf("q1") < 0) {
+            program.currState = "q1";
+        } else {
+            program.states.splice(0, 0, "s");
+        }
+    }
+    program.states.forEach(state => {
+        if (state == "f" || state.includes("halt")) {
+            program.endStates.push(state);
         }
     });
     lblCurrentState.value = program.currState + " - not running yet";
