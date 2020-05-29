@@ -424,17 +424,17 @@ function execNormalProgram(trackNum, programText) {
             newChr: parts[3],
             move: parts[4]
         };
-        if (program.alphabet.indexOf(parts[3]) < 0) {
-            program.alphabet.push(parts[3]);
-        }
         if (program.alphabet.indexOf(parts[1]) < 0) {
             program.alphabet.push(parts[1]);
         }
-        if (program.states.indexOf(parts[2]) < 0) {
-            program.states.push(parts[2]);
+        if (program.alphabet.indexOf(parts[3]) < 0) {
+            program.alphabet.push(parts[3]);
         }
         if (program.states.indexOf(parts[0]) < 0) {
             program.states.push(parts[0]);
+        }
+        if (program.states.indexOf(parts[2]) < 0) {
+            program.states.push(parts[2]);
         }
     }
     if (syntaxInvalid >= 0) {
@@ -457,17 +457,17 @@ function execNormalProgram(trackNum, programText) {
                 newChr: parts[2],
                 move: parts[3]
             };
-            if (program.alphabet.indexOf(parts[2]) < 0) {
-                program.alphabet.push(parts[2]);
-            }
             if (program.alphabet.indexOf(parts[1]) < 0) {
                 program.alphabet.push(parts[1]);
             }
-            if (program.states.indexOf(parts[4]) < 0) {
-                program.states.push(parts[4]);
+            if (program.alphabet.indexOf(parts[2]) < 0) {
+                program.alphabet.push(parts[2]);
             }
             if (program.states.indexOf(parts[0]) < 0) {
                 program.states.push(parts[0]);
+            }
+            if (program.states.indexOf(parts[4]) < 0) {
+                program.states.push(parts[4]);
             }
         }
     }
@@ -475,11 +475,16 @@ function execNormalProgram(trackNum, programText) {
         throw new Error("Syntax error in line " + (syntaxInvalid + 1))
     }
     if (program.states.indexOf("s") < 0) {
-        if (program.states.indexOf("q1") < 0) {
+        if (program.states.indexOf("q1") >= 0) {
+            program.states.splice(program.states.indexOf("q1"), 1);
+            program.states.splice(0, 0, "q1");
             program.currState = "q1";
         } else {
             program.states.splice(0, 0, "s");
         }
+    } else {
+        program.states.splice(program.states.indexOf("s"), 1);
+        program.states.splice(0, 0, "s");
     }
     program.states.forEach(state => {
         if (state == "f" || state.includes("halt")) {
