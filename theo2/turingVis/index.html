@@ -18,7 +18,7 @@
         }
 
         .trackContainer,
-        .container {
+        .turingContainer {
             position: relative;
             width: 100%;
             margin-left: auto;
@@ -70,7 +70,7 @@
 </head>
 
 <body>
-    <div id="container" class="container">
+    <div id="container" class="turingContainer">
         <div class="pointerTrack">
             <div class="pointer">
                 <svg class="bi bi-backspace-reverse-fill" width="2em" height="2em" viewBox="0 0 16 16"
@@ -96,272 +96,44 @@
         </div>
     </div>
 
-    <script>
-        const tracks = document.querySelector(".trackContainer");
-        var allCells = document.querySelectorAll(".cell");
-        const allTracks = document.querySelectorAll(".track");
-        const cellWidth = allCells[0].offsetWidth;
-        var cellsByTrack = [];
-        var trackContent = [];
-        var currOffset = 0;
+    <div class="container mt-5">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Current state:</span>
+            </div>
+            <input type="text" class="form-control" placeholder="Current State" id="lblCurrentState" disabled>
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Program:</span>
+            </div>
+            <textarea class="form-control" placeholder="Machine program" id="machineProgramInput"></textarea>
+        </div>
+        <div class="mb-3">
+            <div>
+                <button type="button" id="btnParseMachine" class="btn btn-success">Parse new code</button>
+                <button type="button" id="btnConvert" class="btn btn-primary">Convert to 6 states</button>
+            </div>
+            <div class="mt-2">
+                <button type="button" id="btnStep" class="btn btn-primary">1 step</button>
+                <button type="button" id="btnRun" class="btn btn-success">Run</button>
+                <button type="button" id="btnStop" class="btn btn-danger">Stop</button>
+            </div>
+        </div>
+    </div>
 
-        function init() {
-            tracks.style.transform = "translateX(50%) translateX(-" + (cellWidth / 2) + "px)";
-            reinitTrackContent();
-        }
-
-        function reinitTrackContent() {
-            trackContent = [];
-            cellsByTrack = [];
-            for (var i = 0; i < allTracks.length; i++) {
-                trackContent.push([]);
-                cellsByTrack.push([]);
-            }
-        }
-
-        function gotoCell(num) {
-            currOffset = num;
-            for (var i = 0; i < allCells.length; i++) {
-                //allCells[i].style.transform = "translateX(-" + (cellWidth * (num + 0.5)) + "px)";
-                allCells[i].style.transform = "translateX(-" + (num * 100) + "%)";
-            }
-        }
-
-        function writeToTrack(trackNum, text) {
-            allCells = [];
-            reinitTrackContent();
-            for (var i = 0; i < allTracks.length; i++) {
-                while (allTracks[i].firstElementChild) {
-                    allTracks[i].firstElementChild.remove();
-                }
-            }
-            for (var i = 0; i < text.length; i++) {
-                for (var a = 0; a < allTracks.length; a++) {
-                    if (a == trackNum) {
-                        trackContent[a][i] = text.charAt(i);
-                        const newTop = document.createElement("div");
-                        newTop.className = "cell border";
-                        newTop.innerText = text.charAt(i);
-                        allTracks[a].appendChild(newTop);
-                        cellsByTrack[a][i] = newTop;
-                        allCells.push(newTop);
-                    } else {
-                        trackContent[a][i] = "";
-                        const newBottom = document.createElement("div");
-                        newBottom.className = "cell";
-                        allTracks[a].appendChild(newBottom);
-                        cellsByTrack[a][i] = newBottom;
-                        allCells.push(newBottom);
-                    }
-                }
-            }
-        }
-
-        function insertOntoTrack(trackNum, end, char) {
-            for (var a = 0; a < allTracks.length; a++) {
-                if (a == trackNum) {
-                    const newTop = document.createElement("div");
-                    newTop.className = "cell border";
-                    newTop.innerText = char;
-                    newTop.style.transform = "translateX(-" + (currOffset * 100) + "%)";
-                    if (end) {
-                        allTracks[a].appendChild(newTop);
-                        cellsByTrack[a].splice(cellsByTrack[a].length, 0, newTop);
-                        trackContent[trackNum].splice(trackContent[trackNum].length, 0, char);
-                    } else {
-                        allTracks[a].prepend(newTop);
-                        cellsByTrack[a].splice(0, 0, newTop);
-                        trackContent[trackNum].splice(0, 0, char);
-                    }
-                    allCells.push(newTop);
-                } else {
-                    const newBottom = document.createElement("div");
-                    newBottom.className = "cell";
-                    newBottom.style.transform = "translateX(-" + (currOffset * 100) + "%)";
-                    if (end) {
-                        allTracks[a].appendChild(newBottom);
-                        cellsByTrack[a].splice(cellsByTrack[a].length, 0, newBottom);
-                        trackContent[trackNum].splice(trackContent[trackNum].length, 0, "");
-                    } else {
-                        allTracks[a].prepend(newBottom);
-                        cellsByTrack[a].splice(0, 0, newBottom);
-                        trackContent[trackNum].splice(0, 0, "");
-                    }
-                    allCells.push(newBottom);
-                }
-            }
-        }
-
-        function changeCellContent(track, index, newChar) {
-            cellsByTrack[track][index].classList.add("border");
-            cellsByTrack[track][index].innerText = newChar;
-        }
-
-        function stepTuringNormal(program, steps) {
-            const numSteps = steps > 0 ? steps : -1;
-            if (numSteps == 0) {
-                return program.hasEnded;
-            }
-            const currChr = trackContent[program.track][program.currentCellIndex]
-            if (program.fun[program.currState] && program.fun[program.currState][currChr]) {
-                trackContent[program.track][program.currentCellIndex] = program.fun[program.currState][currChr].newChr;
-                changeCellContent(program.track, program.currentCellIndex, program.fun[program.currState][currChr].newChr);
-                if (program.fun[program.currState][currChr].move == "l") {
-                    if (program.currentCellIndex > 0) {
-                        program.currentCellIndex--;
-                        gotoCell(program.currentCellIndex);
-                    } else {
-                        insertOntoTrack(program.track, false, "_");
-                    }
-                } else if (program.fun[program.currState][currChr].move == "r") {
-                    if (program.currentCellIndex < trackContent[program.track].length - 1) {
-                        program.currentCellIndex++;
-                        gotoCell(program.currentCellIndex);
-                    } else {
-                        insertOntoTrack(program.track, true, "_");
-                        program.currentCellIndex++;
-                        gotoCell(program.currentCellIndex);
-                    }
-                }
-                if (program.endStates.includes(program.currState)) {
-                    program.hasEnded = true;
-                    program.wasSuccessFull = true;
-                }
-                program.currState = program.fun[program.currState][currChr].newState;
-            } else {
-                program.hasEnded = true;
-                program.wasSuccessFull = false;
-            }
-            if ((numSteps - 1) != 0 && !program.hasEnded) {
-                setTimeout(() => {
-                    stepTuringNormal(program, numSteps - 1);
-                }, 1000);
-            }
-            return program.hasEnded;
-        }
-
-        function stepTuringDual(program, steps) {
-            const numSteps = steps > 0 ? steps : -1;
-            if (numSteps == 0) {
-                return program.hasEnded;
-            }
-            const currChrs = [];
-            for (var i = 0; i < allTracks.length; i++) {
-                if (trackContent[i][program.currentCellIndex] && trackContent[i][program.currentCellIndex].length > 0) {
-                    currChrs.push(trackContent[i][program.currentCellIndex]);
-                }
-            }
-            const currChrsStr = currChrs.join(";");
-            if (program.fun[program.currState] && program.fun[program.currState][currChrsStr]) {
-                const newChrs = program.fun[program.currState][currChrsStr].newChr.split(";");
-                for (var i = 0; i < newChrs.length; i++) {
-                    trackContent[i][program.currentCellIndex] = newChrs[i];
-                    changeCellContent(i, program.currentCellIndex, newChrs[i]);
-                }
-                if (program.fun[program.currState][currChrsStr].move == "l") {
-                    if (program.currentCellIndex > 0) {
-                        program.currentCellIndex--;
-                        gotoCell(program.currentCellIndex);
-                    } else {
-                        insertOntoTrack(program.track, false, "_");
-                    }
-                } else if (program.fun[program.currState][currChrsStr].move == "r") {
-                    if (program.currentCellIndex < trackContent[program.track].length - 1) {
-                        program.currentCellIndex++;
-                        gotoCell(program.currentCellIndex);
-                    } else {
-                        insertOntoTrack(program.track, true, "_");
-                        program.currentCellIndex++;
-                        gotoCell(program.currentCellIndex);
-                    }
-                }
-                if (program.endStates.includes(program.currState)) {
-                    program.hasEnded = true;
-                    program.wasSuccessFull = true;
-                }
-                program.currState = program.fun[program.currState][currChrsStr].newState;
-            } else {
-                program.hasEnded = true;
-                program.wasSuccessFull = false;
-            }
-            if ((numSteps - 1) != 0 && !program.hasEnded) {
-                setTimeout(() => {
-                    stepTuringDual(program, numSteps - 1);
-                }, 1000);
-            }
-            return program.hasEnded;
-        }
-
-        function convertMachineToIneffective(program) {
-            var newProgram = {
-                fun: {},
-                currentCellIndex: 0,
-                track: trackNum,
-                endStates: ["f"],
-                currState: "s",
-                hasEnded: false,
-                wasSuccessFull: false,
-                alphabet: [],
-                exec: (steps) => { stepTuringDual(this, steps) }
-            };
-            program.alphabet.forEach(char => {
-                newProgram.fun["s"][char] = {
-                    newState: "d",
-                    newChr: "w;q1",
-                    move: "n"
-                };
-                newProgram.fun["l_from"][char + ";q0"] = {
-                    newState: "d",
-                    newChr: "w;q_0",
-                    move: "l"
-                };
-                newProgram.fun["r_from"][char + ";q0"] = {
-                    newState: "d",
-                    newChr: "w;q_0",
-                    move: "l"
-                };
-            });
-            return newProgram;
-        }
-
-        function execNormalProgram(trackNum, programText) {
-            var operations = programText.split("\n").map(l => l.trim().toLowerCase()).filter(l => !l.startsWith("#") && l.length != 0);
-            var program = {
-                fun: {},
-                currentCellIndex: 0,
-                track: trackNum,
-                endStates: ["f"],
-                currState: "s",
-                hasEnded: false,
-                wasSuccessFull: false,
-                alphabet: [],
-                states: ["s", "f"],
-                exec: (steps) => { stepTuringNormal(this, steps) }
-            };
-            operations.forEach(line => {
-                var parts = line.split(",");
-                if (!program.fun[parts[0]]) {
-                    program.fun[parts[0]] = {};
-                }
-                program.fun[parts[0]][parts[1]] = {
-                    newState: parts[2],
-                    newChr: parts[3],
-                    move: parts[4]
-                };
-                if (program.alphabet.indexOf(parts[3]) < 0) {
-                    program.alphabet.push(parts[3]);
-                }
-                if (program.states.indexOf(parts[2]) < 0) {
-                    program.states.push(parts[2]);
-                }
-            });
-
-            return program;
-        }
-
-        init();
-
-    </script>
+    <script src="logic.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
